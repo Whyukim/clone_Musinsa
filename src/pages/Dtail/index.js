@@ -1,11 +1,11 @@
 import React from 'react';
-import { DetailWrapper, ProductWrapper } from './styles';
+import { DetailWrapper, ProductWrapper, DetailContainer } from './styles';
 
 import ProductInfoRight from 'components/DetailProduct/ProductInfoRight/InfoRight';
 import ProductInfoLeft from 'components/DetailProduct/ProductInfoLeft';
 import HeaderInfo from 'components/DetailProduct/ProductInfoRight/HeaderInfo';
 import ProductInfo from 'components/DetailProduct/ProductInfo';
-import { GetApi, PostHeaderBodyApi } from 'utils/api';
+import { GetApi } from 'utils/api';
 import { useEffect } from 'react';
 import {
 	initialProduceDetail,
@@ -18,7 +18,9 @@ import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { URLquery } from 'utils/URLquery';
 import Footer from 'layouts/Footer';
-import { getData } from 'utils/getData';
+import Header from 'layouts/Header';
+import Sidebar from 'layouts/Sidebar';
+import DialLog from 'layouts/DialLog';
 
 const dummyProduct = {
 	BigCategoryName: '상의',
@@ -101,22 +103,6 @@ const DetailProduct = () => {
 					product: result.data.product,
 				}));
 
-				const { accessToken } = getData();
-				const data = {
-					keys: ['address'],
-				};
-				const user = await PostHeaderBodyApi(
-					`/api/auth/getUserData`,
-					data,
-					'Authorization',
-					accessToken,
-				);
-				console.log(user);
-				// setInitialProduceDetail(prev => ({
-				// 	...prev,
-				// 	user: result.data.product,
-				// }));
-
 				setLoading(false);
 			} catch (error) {
 				console.error(error);
@@ -132,15 +118,20 @@ const DetailProduct = () => {
 				<div>Loading...</div>
 			) : (
 				<ProductDetailProvider value={initialProduceDetail}>
-					<DetailWrapper>
-						<HeaderInfo />
-						<ProductWrapper>
-							<ProductInfoLeft data={dummyProduct} />
-							<ProductInfoRight data={dummyProduct} />
-						</ProductWrapper>
-					</DetailWrapper>
-					<ProductInfo />
-					<Footer></Footer>
+					<Header></Header>
+					<Sidebar></Sidebar>
+					<DialLog></DialLog>
+					<DetailContainer>
+						<DetailWrapper>
+							<HeaderInfo />
+							<ProductWrapper>
+								<ProductInfoLeft data={dummyProduct} />
+								<ProductInfoRight data={dummyProduct} />
+							</ProductWrapper>
+						</DetailWrapper>
+						<ProductInfo />
+						<Footer></Footer>
+					</DetailContainer>
 				</ProductDetailProvider>
 			)}
 		</>

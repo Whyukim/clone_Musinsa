@@ -59,7 +59,7 @@ const PurchaseForm = () => {
 	const dispatch = useProductDetailDispatch();
 	const user = getData();
 
-	const [clickedlike, setClickedlike] = useState(true);
+	const [clickedlike, setClickedlike] = useState(false);
 
 	const [optionData, setOptionData] = useState({
 		option1: '옵션 선택',
@@ -257,14 +257,10 @@ const PurchaseForm = () => {
 
 		setClickedlike(prev => !prev);
 		if (clickedlike) {
-			console.log(detail.product);
-
 			changeDispatch(LIKES, {
 				likes: detail.product.likes - 1,
 			});
-
 			detail.product.likes -= 1;
-
 			try {
 				const params = {
 					productId: query.productId,
@@ -290,7 +286,7 @@ const PurchaseForm = () => {
 	}, [clickedlike]);
 
 	// 장바구니 추가
-	const onClickBasket = useCallback(() => {
+	const onClickBasket = useCallback(async () => {
 		if (!user) {
 			const { pathname, search } = location;
 			navigate(`/login?redirect=${pathname}${search}`);
@@ -303,9 +299,12 @@ const PurchaseForm = () => {
 			const params = {
 				productId: query.productId,
 			};
-			PostHeaderBodyApi('/api/product/addCart', params, 'Authorization', token);
+			await PostHeaderBodyApi('/api/product/addCart', params, 'Authorization', token);
 			setModalBasket(true);
-		} catch (error) {}
+			console.log(123123);
+		} catch (error) {
+			console.error(error);
+		}
 	}, []);
 
 	const onCloseModal = useCallback(() => {
