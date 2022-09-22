@@ -1,53 +1,21 @@
 import React, { useReducer, createContext, useContext } from 'react';
 
-const initialUser = {
-	authKakao: false,
-	authEmail: '',
-	authEmailCheck: '',
-	authPhoneNumber: '',
-	authPhoneCheck: '',
+const initialOffset = {
+	x: 0,
+	y: 0,
+	
 };
 
-export const AUTHINIT = 'AUTHINIT';
-export const AUTHKAKAO = 'AUTHKAKAO';
-export const AUTHPHONENUMBER = 'AUTHPHONENUMBER';
-export const AUTHPHONECHECK = 'AUTHPHONECHECK';
-export const AUTHEMAIL = 'AUTHEMAIL';
-export const AUTHEMAILCHECK = 'AUTHEMAILCHECK';
+export const posX = '';
+export const posY = '';
 
-function userReducer(state, action) {
+function layOutReducer(state, action) {
 	switch (action.type) {
-		case AUTHINIT:
-			return initialUser;
-
-		case AUTHKAKAO:
+		case LOGIN:
 			return {
 				...state,
-				authKakao: action.payload.authKakao,
-			};
-
-		case AUTHPHONENUMBER:
-			return {
-				...state,
-				authPhoneNumber: action.payload.authPhoneNumber,
-			};
-
-		case AUTHPHONECHECK:
-			return {
-				...state,
-				authPhoneCheck: action.payload.authPhoneCheck,
-			};
-
-		case AUTHEMAIL:
-			return {
-				...state,
-				authEmail: action.payload.authEmail,
-			};
-
-		case AUTHEMAILCHECK:
-			return {
-				...state,
-				authEmailCheck: action.payload.authEmailCheck,
+				login: action.payload.login,
+				token: action.payload.token,
 			};
 
 		default:

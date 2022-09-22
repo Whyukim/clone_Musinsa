@@ -15,23 +15,29 @@ import {
 	SignupContainer,
 	SignupCheckBox,
 	SignupButton,
+	KakaoKeyframes,
 } from './styles';
 import { baseUrl, PostApi } from 'utils/api';
 import {
-	EMAIL,
-	EMAILCHECK,
-	PHONECHECK,
-	PHONENUMBER,
+	AUTHEMAIL,
+	AUTHEMAILCHECK,
+	AUTHINIT,
+	AUTHKAKAO,
+	AUTHPHONECHECK,
+	AUTHPHONENUMBER,
 	useUserDispatch,
 	useUserState,
 } from 'context/UserContext';
 import axios from 'axios';
-import { Navigate, useNavigate } from 'react-router';
+import { Navigate, useLocation, useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
+import { URLquery } from 'utils/URLquery';
 
 const Signup = () => {
 	const user = useUserState();
 	const dispatch = useUserDispatch();
+	const location = useLocation();
+	const url = URLquery(location);
 	const navigate = useNavigate();
 
 	const [email, setEmail] = useState('');
@@ -48,9 +54,9 @@ const Signup = () => {
 	const passwordConfirmRef = useRef();
 
 	const [auth, setAuth] = useState('emailAuth');
-	const [authNumber, setauthNumber] = useState('');
-	const [authNumberReg, setauthNumberReg] = useState(false);
-	const [authNumberBtnReg, setauthNumberBtnReg] = useState(false);
+	const [authNumber, setAuthNumber] = useState('');
+	const [authNumberReg, setAuthNumberReg] = useState(false);
+	const [authNumberBtnReg, setAuthNumberBtnReg] = useState(false);
 	const [authStage, setAuthStage] = useState(1);
 
 	const [authKakao, setAuthKakao] = useState(false);
@@ -84,39 +90,55 @@ const Signup = () => {
 
 	const [signUpBtn, setSignUpBtn] = useState(false);
 
+	const changeDispatch = useCallback((type, payload) => {
+		return dispatch({ type, payload });
+	}, []);
+
 	// 카카오 가입
 	const kakaoSignUp = async () => {
+		const { token } = url;
+		const REST_API_KEY = process.env.REACT_APP_KAKAO_REST_API;
+
 		try {
+			// Kakao Javascript SDK 초기화
+			await window.Kakao.init(REST_API_KEY);
+			// access token 설정
+			await window.Kakao.Auth.setAccessToken(token);
 			// Kakao SDK API를 이용해 사용자 정보 획득
 			let data = await window.Kakao.API.request({
 				url: '/v2/user/me',
 			});
-			console.log(data);
 
 			// 사용자 정보 변수에 저장
-			setauthNumber(data.kakao_account.email);
-			setAuthStage(3);
+			setAuthNumber(data.kakao_account.email);
+			setAuthNumberReg(true);
 			setAuthKakao(true);
+
+			changeDispatch(AUTHKAKAO, { authKakao: true });
 		} catch (err) {
 			console.log(err);
 		}
 	};
 
 	useEffect(() => {
-		kakaoSignUp();
+		const { kakao } = url;
+		if (kakao) kakaoSignUp();
 	}, []);
 
 	const onClickClear = useCallback(() => {
-		setauthNumber('');
+		setAuthNumber('');
 	}, [authNumber]);
 
 	const onChangeRadio = useCallback(
 		e => {
-			setAuth(e.target.value);
-			setauthNumber('');
-			setauthNumberReg(true);
+			const { value } = e.target;
+			setAuth(value);
+			setAuthNumber('');
+			setAuthNumberReg(true);
 			setAuthStage(1);
-			setauthNumberBtnReg(false);
+			setAuthNumberBtnReg(false);
+
+			dispatch({ type: AUTHINIT });
 		},
 		[auth],
 	);
@@ -134,10 +156,10 @@ const Signup = () => {
 					PostApi('/api/auth/authEmail', params)
 						.then(() => {
 							const payload = {
-								email: authNumber,
+								authEmail: authNumber,
 							};
 
-							dispatch({ type: EMAIL, payload });
+							dispatch({ type: AUTHEMAIL, payload });
 							setModalAuth(true);
 						})
 						.catch(err => {
@@ -147,25 +169,24 @@ const Signup = () => {
 
 				// 이메일 2차인증
 				else if (auth === 'emailAuth' && authStage === 2) {
-					const { email } = user;
+					const { authEmail } = user;
 
 					const params = {
-						email,
+						email: authEmail,
 						number: authNumber,
 					};
 
 					PostApi('/api/auth/checkEmail', params)
 						.then(res => {
-							console.log(res);
 							setModalAuthConfirm(true);
 
 							const payload = {
-								emailCheck: res.data.emailCheck,
+								authEmailCheck: res.data.emailCheck,
 							};
-							dispatch({ type: EMAILCHECK, payload });
+							dispatch({ type: AUTHEMAILCHECK, payload });
 						})
 						.catch(err => {
-							setauthNumberBtnReg(true);
+							setAuthNumberBtnReg(true);
 							console.error('error', err);
 						});
 				}
@@ -179,10 +200,10 @@ const Signup = () => {
 					PostApi('/api/auth/sendSMS', params)
 						.then(() => {
 							const payload = {
-								phoneNumber: authNumber.replaceAll('-', ''),
+								authPhoneNumber: authNumber.replaceAll('-', ''),
 							};
 
-							dispatch({ type: PHONENUMBER, payload });
+							dispatch({ type: AUTHPHONENUMBER, payload });
 							setModalAuth(true);
 						})
 						.catch(err => {
@@ -192,10 +213,10 @@ const Signup = () => {
 
 				// 휴대폰 2차인증
 				else if (auth === 'phoneAuth' && authStage === 2) {
-					const { phoneNumber } = user;
+					const { authPhoneNumber } = user;
 
 					const params = {
-						phoneNumber,
+						phoneNumber: authPhoneNumber,
 						code: authNumber,
 					};
 
@@ -204,12 +225,12 @@ const Signup = () => {
 							setModalAuthConfirm(true);
 
 							const payload = {
-								phoneCheck: res.data.phoneCheck,
+								authPhoneCheck: res.data.phoneCheck,
 							};
-							dispatch({ type: PHONECHECK, payload });
+							dispatch({ type: AUTHPHONECHECK, payload });
 						})
 						.catch(err => {
-							setauthNumberBtnReg(true);
+							setAuthNumberBtnReg(true);
 							console.error('error', err);
 						});
 				}
@@ -257,25 +278,25 @@ const Signup = () => {
 		async e => {
 			e.preventDefault();
 
-			const { email, emailCheck, phoneNumber, phoneCheck } = user;
+			const { authEmail, authEmailCheck, authPhoneNumber, authPhoneCheck } = user;
 
 			const params = {
 				loginId: email,
 				password: password,
 				agreement: checkValue.checkSns ? '1' : '0',
-				questionType: '1',
-				questionAnswer: 'none',
 				address: `(${deliveryInfo.address1})${deliveryInfo.address2}${deliveryInfo.address3}`,
-				email: email,
-				phoneNumber: phoneNumber,
+				email: authEmail,
+				phoneNumber: authPhoneNumber,
 			};
 
+			const { kakao } = url;
 			axios
 				.post(`${baseUrl}/api/auth/signup`, params, {
 					headers: {
 						'Content-Type': 'application/json',
-						emailCheck,
-						phoneCheck,
+						emailCheck: authEmailCheck,
+						phoneCheck: authPhoneCheck,
+						encryptioncode: kakao,
 					},
 				})
 				.then(res => {
@@ -315,12 +336,17 @@ const Signup = () => {
 
 		if (authStage === 1) {
 			setAuthStage(2);
-			setauthNumber('');
+			setAuthNumber('');
 		} else if (authStage === 2) {
 			setAuthStage(3);
-			setauthNumber('');
+
+			if (auth === 'emailAuth') {
+				setAuthNumber(user.authEmail);
+			} else {
+				setAuthNumber(user.authPhoneNumber);
+			}
 		}
-	}, [authStage]);
+	}, [authStage, auth, user]);
 
 	const onCloseLinkModal = useCallback(() => {
 		setModalSignUp(false);
@@ -371,7 +397,7 @@ const Signup = () => {
 
 	const onChangeauthNumber = useCallback(
 		e => {
-			setauthNumber(e.target.value);
+			setAuthNumber(e.target.value);
 
 			let regExp;
 
@@ -384,8 +410,8 @@ const Signup = () => {
 				regExp = /\d{6}/g;
 			}
 
-			if (regExp.test(e.target.value.replaceAll('-', ''))) setauthNumberReg(true);
-			else setauthNumberReg(false);
+			if (regExp.test(e.target.value.replaceAll('-', ''))) setAuthNumberReg(true);
+			else setAuthNumberReg(false);
 		},
 		[auth, authStage],
 	);
@@ -418,10 +444,10 @@ const Signup = () => {
 	useEffect(() => {
 		if (auth === 'phoneAuth') {
 			if (authNumber.length === 10) {
-				setauthNumber(authNumber.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3'));
+				setAuthNumber(authNumber.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3'));
 			}
 			if (authNumber.length === 13) {
-				setauthNumber(authNumber.replace(/-/g, '').replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3'));
+				setAuthNumber(authNumber.replace(/-/g, '').replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3'));
 			}
 		}
 	}, [auth, authNumber]);
@@ -541,14 +567,22 @@ const Signup = () => {
 								<span>필수 입력</span>
 							</label>
 
-							<div className="email-check">
+							<div
+								className="email-check"
+								style={
+									authStage === 3 ? { backgroundColor: '#e5e5e5' } : { backgroundColor: '#fff' }
+								}
+							>
 								<input
 									className={auth}
 									type={auth === 'phoneAuth' ? 'tel' : 'email'}
 									value={authNumber}
+									style={
+										authStage === 3 ? { backgroundColor: '#e5e5e5' } : { backgroundColor: '#fff' }
+									}
 									onChange={onChangeauthNumber}
 									maxLength={authStage === 2 ? 6 : auth === 'phoneAuth' && 13}
-									disabled={authStage === 3 ? true : false}
+									disabled={(authKakao && authStage === 1) || authStage === 3 ? true : false}
 								/>
 								{!authKakao && authNumber?.length > 0 && (
 									<button type="button" onClick={() => onClickClear()}>
@@ -563,6 +597,7 @@ const Signup = () => {
 								>
 									{authStage === 1 ? '본인인증' : authStage === 2 ? '번호확인' : '인증완료'}
 								</button>
+								{authKakao && <KakaoKeyframes></KakaoKeyframes>}
 							</div>
 
 							{authStage === 1 &&
@@ -609,8 +644,6 @@ const Signup = () => {
 								<a target="_blank" onClick={() => openPop('agree')}>
 									자세히
 								</a>
-
-								{/* <a href="signup/agreement/privacy-usage" target="_blank"></a> */}
 							</div>
 							<div className="check">
 								<label htmlFor="checkTerms">
