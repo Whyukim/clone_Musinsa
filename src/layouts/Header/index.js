@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AiOutlineCamera, AiOutlineSearch } from 'react-icons/ai';
 import { getData } from 'utils/getData';
 import { deleteData } from 'utils/deleteData';
-import { DeleteHeaderBodyApi, PostHeaderApi, PostHeaderBodyApi } from 'utils/api';
+import { DeleteHeaderBodyApi, PostHeaderApi, PostHeaderBodyApi, PostQueryApi } from 'utils/api';
 import { IoMdArrowDropup } from 'react-icons/io';
 import Cookies from 'js-cookie';
 import useSWR from 'swr';
@@ -23,19 +23,23 @@ const Header = props => {
 	const [open, setOpen] = useState(false);
 	const [notice, setNotice] = useState(false);
 
-	const [modalFirst, setModalFirst] = useState(true);
+	const [modalFirst, setModalFirst] = useState(false);
 	const onCloseModal = useCallback(() => {
 		setModalFirst(false);
-		navigate('/', { replace: true });
+	}, []);
+	useEffect(() => {
+		PostQueryApi(`/api/product/productList`).catch(() => {
+			setModalFirst(true);
+		});
 	}, []);
 
-	const {
-		data: shoppingNumber,
-		mutate,
-		error,
-	} = useSWR(token ? '/api/shoppingBasket/shoppingList' : null, url => fetcher(url, token), {
-		refreshInterval: 0,
-	});
+	const { data: shoppingNumber, mutate } = useSWR(
+		token ? '/api/shoppingBasket/shoppingList' : null,
+		url => fetcher(url, token),
+		{
+			refreshInterval: 0,
+		},
+	);
 
 	const onClickHello = useCallback(() => {
 		const params = {
@@ -117,10 +121,6 @@ const Header = props => {
 				console.log(err);
 			});
 	}, [login]);
-
-	if (error !== undefined) {
-		setModalFirst(true);
-	}
 
 	return (
 		<>
