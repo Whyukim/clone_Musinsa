@@ -118,7 +118,7 @@ const Header = props => {
 			});
 	}, [login]);
 
-	if (error) {
+	if (error !== undefined) {
 		setModalFirst(true);
 	}
 
