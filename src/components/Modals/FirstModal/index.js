@@ -24,7 +24,7 @@ const FirstModal = ({ show, onCloseModal }) => {
 						<img src={error3} />
 					</li>
 					<li>
-						<h4>새로고침 후 데이터를 다시 한번 확인해주세요.</h4>
+						<h4>새로고침 후 데이터를 다시 한번 확인해주세요. 감사합니다.</h4>
 					</li>
 				</ul>
 			</Container>
