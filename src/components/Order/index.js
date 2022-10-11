@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useContext } from 'react';
 import { useState } from 'react';
 import TextModal from 'components/Modals/TextModal';
 import { useEffect } from 'react';
@@ -6,83 +6,109 @@ import { PostHeaderBodyApi } from 'utils/api';
 import { getData } from 'utils/getData';
 import { URLquery } from 'utils/URLquery';
 import { useLocation } from 'react-router';
+import { useScript } from 'hooks/useScript';
 
 const impNumber = process.env.REACT_APP_PAYMENT;
 
 const Order = ({ modal, pay }) => {
-	const data = getData();
-	const { accessToken } = data;
+    const jQueryScript = useScript('https://code.jquery.com/jquery-1.12.4.min.js');
+    const iamportScript = useScript('https://cdn.iamport.kr/js/iamport.payment-1.1.8.js');
 
-	const location = useLocation();
-	const query = URLquery(location);
-	const { productId } = query;
+    const data = getData();
+    const { accessToken } = data;
 
-	const [modalOrder, setModalOrder] = useState(false);
+    const location = useLocation();
+    const query = URLquery(location);
+    const { productId } = query;
 
-	useEffect(() => {
-		let pg = '';
-		let pay_method = '';
-		let price = 10;
-		if (pay === 'card') pg = 'html5_inicis';
-		else if (pay === 'Virtual') pg = 'html5_inicis';
-		else if (pay === 'kakao') pg = 'kakaopay';
-		else if (pay == 'payco') pg = 'payco';
+    const [modalOrder, setModalOrder] = useState(false);
 
-		if (pay === 'Virtual') pay_method = 'vbank';
-		else pay_method = 'card';
+    useEffect(() => {
+        if (iamportScript === 'ready' && jQueryScript === 'ready') {
+            console.log(jQueryScript);
+            //     // sdk 초기화하기
+            //     window.SomeThingSDK();
+            let pg = '';
+            let pay_method = '';
+            let price = 10;
+            let productPrice = 10;
+            if (pay === 'card') pg = 'html5_inicis';
+            else if (pay === 'Virtual') pg = 'html5_inicis';
+            else if (pay === 'kakao') pg = 'kakaopay';
+            else if (pay == 'payco') pg = 'payco';
 
-		var { IMP } = window; // 생략가능
-		IMP.init(impNumber); // <-- 본인 가맹점 식별코드 삽입
-		IMP.request_pay(
-			{
-				pg,
-				pay_method,
-				merchant_uid: `mid_${new Date().getTime()}`,
-				name: 'Test 상품',
-				amount: price,
-				buyer_email: 'devhyuktest@gmail.com',
-				buyer_name: '홍길동',
-				buyer_tel: '01096361038',
-				buyer_addr: '서울특별시 강남구 신사동',
-				buyer_postcode: '01181',
-			},
-			rsp => {
-				console.log(rsp);
-				// callback
-				if (rsp.success) {
-					// 결제 성공 시 로직,
-					const data = {
-						imp_uid: rsp.imp_uid,
-						Merchant_uid: rsp.merchant_uid,
-						ProductId: productId,
-						price,
-						amount: 2,
-					};
+            if (pay === 'Virtual') pay_method = 'vbank';
+            else pay_method = 'card';
 
-					PostHeaderBodyApi('/api/product/purchase', data, 'Authorization', accessToken).then(
-						res => {
-							setModalOrder(true);
-						},
-					);
-				} else {
-					// 결제 실패 시 로직,
-					console.log(2);
-				}
-			},
-		);
-	}, [pay]);
+            console.log(window);
 
-	const onCloseModal = useCallback(() => {
-		setModalOrder(false);
-	}, []);
+            var { IMP } = window; // 생략가능
+            console.log(IMP);
+            IMP.init(impNumber); // <-- 본인 가맹점 식별코드 삽입
+            IMP.request_pay(
+                {
+                    pg,
+                    pay_method,
+                    merchant_uid: `mid_${new Date().getTime()}`,
+                    name: 'Test 상품',
+                    amount: price,
+                    buyer_email: 'devhyuktest@gmail.com',
+                    buyer_name: '홍길동',
+                    buyer_tel: '01096361038',
+                    buyer_addr: '서울특별시 강남구 신사동',
+                    buyer_postcode: '01181',
+                },
+                rsp => {
+                    console.log(rsp);
+                    // callback
+                    if (rsp.success) {
+                        // 결제 성공 시 로직,
+                        if (productId == undefined) {
+                            const data = {
+                                shoppingBasketId: 1,
+                                productId: 1,
+                                MerchantUid: rsp.merchant_uid,
+                                imp_uid: rsp.imp_uid,
+                                price,
+                                productPrice,
+                            };
+                        } else {
+                            const data = {
+                                imp_uid: rsp.imp_uid,
+                                Merchant_uid: rsp.merchant_uid,
+                                ProductId: productId,
+                                price,
+                                amount: 2,
+                            };
+                            PostHeaderBodyApi(
+                                '/api/product/purchase',
+                                data,
+                                'Authorization',
+                                accessToken,
+                            ).then(res => {
+                                setModalOrder(true);
+                            });
+                        }
+                    } else {
+                        // 결제 실패 시 로직,
+                        console.log(2);
+                    }
+                },
+            );
+        }
+    }, [jQueryScript, iamportScript, pay]);
 
-	return (
-		<TextModal
-			show={modalOrder}
-			onCloseModal={onCloseModal}
-			content="결제가 완료 되었습니다."
-		></TextModal>
-	);
+    const onCloseModal = useCallback(() => {
+        setModalOrder(false);
+    }, []);
+
+    return (
+        <TextModal
+            show={modalOrder}
+            onCloseModal={onCloseModal}
+            content="결제가 완료 되었습니다."
+        ></TextModal>
+    );
 };
 
 export default Order;
