@@ -10,7 +10,7 @@ import { useScript } from 'hooks/useScript';
 
 const impNumber = process.env.REACT_APP_PAYMENT;
 
-const Order = ({ modal, pay, ShoppingBasketId }) => {
+const Order = ({ modal, pay, checkList }) => {
     const jQueryScript = useScript('https://code.jquery.com/jquery-1.12.4.min.js');
     const iamportScript = useScript('https://cdn.iamport.kr/js/iamport.payment-1.1.8.js');
 
@@ -25,13 +25,10 @@ const Order = ({ modal, pay, ShoppingBasketId }) => {
 
     useEffect(() => {
         if (iamportScript === 'ready' && jQueryScript === 'ready') {
-            console.log(jQueryScript);
-            //     // sdk 초기화하기
-            //     window.SomeThingSDK();
             let pg = '';
             let pay_method = '';
-            let price = 10;
-            let productPrice = 10;
+            let price = 100;
+
             if (pay === 'card') pg = 'html5_inicis';
             else if (pay === 'Virtual') pg = 'html5_inicis';
             else if (pay === 'kakao') pg = 'kakaopay';
@@ -40,10 +37,7 @@ const Order = ({ modal, pay, ShoppingBasketId }) => {
             if (pay === 'Virtual') pay_method = 'vbank';
             else pay_method = 'card';
 
-            console.log(window);
-
             var { IMP } = window; // 생략가능
-            console.log(IMP);
             IMP.init(impNumber); // <-- 본인 가맹점 식별코드 삽입
             IMP.request_pay(
                 {
@@ -59,18 +53,13 @@ const Order = ({ modal, pay, ShoppingBasketId }) => {
                     buyer_postcode: '01181',
                 },
                 rsp => {
-                    console.log(rsp);
                     // callback
                     if (rsp.success) {
                         // 결제 성공 시 로직,
                         if (productId == undefined) {
                             const data = {
                                 purchasedDataList: [
-                                    {
-                                        shoppingBasketId: ShoppingBasketId,
-                                        price,
-                                        amount: 1,
-                                    },
+                                    checkList
                                 ],
                                 MerchantUid: rsp.merchant_uid,
                                 imp_uid: rsp.imp_uid,
@@ -102,7 +91,7 @@ const Order = ({ modal, pay, ShoppingBasketId }) => {
                         }
                     } else {
                         // 결제 실패 시 로직,
-                        console.log(2);
+                        console.log('error');
                     }
                 },
             );
