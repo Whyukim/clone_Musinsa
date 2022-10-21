@@ -27,6 +27,8 @@ import ConfirmModal from 'components/Modals/ConfirmModal';
 import OrderModal from 'components/Modals/OrderModal';
 import Cookies from 'js-cookie';
 import { useMemo } from 'react';
+import useSWR from 'swr';
+import fetcher from 'utils/fetcher';
 
 const PurchaseForm = () => {
     const navigate = useNavigate();
@@ -35,6 +37,7 @@ const PurchaseForm = () => {
     const detail = useProductDetailState();
     const dispatch = useProductDetailDispatch();
     const user = getData();
+    const loginToken = getData()?.accessToken;
 
     const [clickedlike, setClickedlike] = useState(false);
 
@@ -43,19 +46,26 @@ const PurchaseForm = () => {
         option2: '옵션 선택',
     });
     const [option, setOption] = useState({});
-    const [selectList, setSelectList] = useState({});
     const [selectIdx, setSelectIdx] = useState();
 
     const [firstSelectId, setFirstSelectId] = useState();
     const [selectArr, setSelectArr] = useState([]);
 
-    const [totalPrice, setTotalPrice] = useState(0);
-
     const [pay, setPay] = useState('card');
     const [order, setOrder] = useState(false);
+    const [orderArr, setOrderArr] = useState();
 
     const [modalOrder, setModalOrder] = useState(false);
     const [modalBasket, setModalBasket] = useState(false);
+
+    //장바구니 리스트
+    const { data: shoppingNumber, mutate } = useSWR(
+        loginToken ? '/api/shoppingBasket/shoppingList' : null,
+        url => fetcher(url, loginToken),
+        {
+            refreshInterval: 0,
+        },
+    );
 
     // 데이터 구조 변경
     const optionDataStructureChange = useCallback(() => {
@@ -214,7 +224,7 @@ const PurchaseForm = () => {
         [selectArr],
     );
 
-    const TotalPr = useMemo(() => {
+    const totalPrice = useMemo(() => {
         return selectArr.length > 0
             ? selectArr?.map(v => Number(v[2]))?.reduce((a, b) => a + b) *
                   detail.product.rookiePrice
@@ -268,24 +278,23 @@ const PurchaseForm = () => {
 
     // 장바구니 추가
     const onClickBasket = useCallback(async () => {
-        // if (!user) {
-        //     const { pathname, search } = location;
-        //     Cookies.set('redirect', pathname + search);
-        //     navigate(`/login`);
-        // }
-        // create arr ############
+        if (!user) {
+            const { pathname, search } = location;
+            Cookies.set('redirect', pathname + search);
+            navigate(`/login`);
+        }
+
         const addCarts = [];
         for (let list of selectArr) {
             const obj = {
                 productId: query.productId,
-                productMainTagId: Number(list[0]),
-                productSubTagId: Number(list[1]),
+                mainTagId: Number(list[0]),
+                subTagId: Number(list[1]),
                 packingAmount: list[2],
             };
             addCarts.push(obj);
         }
 
-        // create arr ############
         const token = user.accessToken;
         try {
             const params = {
@@ -293,6 +302,7 @@ const PurchaseForm = () => {
             };
             await PostHeaderBodyApi('/api/product/addCart', params, 'Authorization', token);
             setModalBasket(true);
+            mutate();
         } catch (error) {
             console.error(error);
         }
@@ -319,6 +329,19 @@ const PurchaseForm = () => {
 
         if (selectArr.length === 0) return alert('구매하실 상품이 없습니다.');
 
+        const orderList = [];
+        for (let list of selectArr) {
+            const obj = {
+                ProductId: query.productId,
+                price: '100',
+                amount: String(list[2]),
+                ProductMainTagId: list[0],
+                ProductSubTagId: list[1],
+            };
+            orderList.push(obj);
+        }
+
+        setOrderArr(orderList);
         setModalOrder(true);
     }, [selectArr]);
 
@@ -333,10 +356,6 @@ const PurchaseForm = () => {
         setModalOrder(false);
         setOrder(true);
     }, []);
-
-    useEffect(() => {
-        console.log('Fruit', selectArr);
-    }, [selectArr]);
 
     return (
         <div>
@@ -426,11 +445,11 @@ const PurchaseForm = () => {
 
             <TotalPrice>
                 <p>총 상품 금액</p>
-                <div>{thousandComma(TotalPr)}원</div>
+                <div>{thousandComma(totalPrice)}원</div>
             </TotalPrice>
             <ButtonWrapper>
                 <ButtonBuy onClick={onClickOrderButton}>바로구매</ButtonBuy>
-                {order && <Order pay={pay} />}
+                {order && <Order pay={pay} orderArr={orderArr} />}
                 <ButtonLike clickedlike={clickedlike} onClick={onLikeClicked}>
                     <Button clickedlike={clickedlike} />
                     <Like clickedlike={clickedlike}>{thousandComma(detail.product.likes)}</Like>
@@ -445,7 +464,7 @@ const PurchaseForm = () => {
                     show={modalOrder}
                     onCloseModal={onCloseModal}
                     onClickConfirm={onClickOrder}
-                    price={thousandComma(totalPrice * detail.product.rookiePrice)}
+                    price={thousandComma(totalPrice)}
                     pay={pay}
                     setPay={setPay}
                 ></OrderModal>

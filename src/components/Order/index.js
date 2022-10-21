@@ -10,7 +10,7 @@ import { useScript } from 'hooks/useScript';
 
 const impNumber = process.env.REACT_APP_PAYMENT;
 
-const Order = ({ modal, pay, checkList }) => {
+const Order = ({ modal, pay, orderArr, checkList }) => {
     const jQueryScript = useScript('https://code.jquery.com/jquery-1.12.4.min.js');
     const iamportScript = useScript('https://cdn.iamport.kr/js/iamport.payment-1.1.8.js');
 
@@ -22,27 +22,26 @@ const Order = ({ modal, pay, checkList }) => {
     const { productId } = query;
 
     const [modalOrder, setModalOrder] = useState(false);
+    console.log(orderArr);
 
     useEffect(() => {
         if (iamportScript === 'ready' && jQueryScript === 'ready') {
             let pg = '';
             let pay_method = '';
-            let price = 100;
+            let price = 0;
+
+            price = orderArr.reduce((a, b) => a + Number(b.price), 0);
 
             if (pay === 'card') pg = 'html5_inicis';
-            else if (pay === 'Virtual') pg = 'html5_inicis';
             else if (pay === 'kakao') pg = 'kakaopay';
             else if (pay == 'payco') pg = 'payco';
-
-            if (pay === 'Virtual') pay_method = 'vbank';
-            else pay_method = 'card';
 
             var { IMP } = window; // 생략가능
             IMP.init(impNumber); // <-- 본인 가맹점 식별코드 삽입
             IMP.request_pay(
                 {
                     pg,
-                    pay_method,
+                    pay_method: 'card',
                     merchant_uid: `mid_${new Date().getTime()}`,
                     name: 'Test 상품',
                     amount: price,
@@ -58,10 +57,11 @@ const Order = ({ modal, pay, checkList }) => {
                         // 결제 성공 시 로직,
                         if (productId == undefined) {
                             const data = {
-                                purchasedDataList: [checkList],
-                                MerchantUid: rsp.merchant_uid,
+                                purchasedDataList: orderArr,
+                                merchant_uid: rsp.merchant_uid,
                                 imp_uid: rsp.imp_uid,
                             };
+
                             PostHeaderBodyApi(
                                 '/api/shoppingBasket/purchase',
                                 data,
@@ -76,24 +76,21 @@ const Order = ({ modal, pay, checkList }) => {
                                     imp_uid: rsp.imp_uid,
                                     Merchant_uid: rsp.merchant_uid,
                                 },
-                                orderList: [
-                                    {
-                                        ProductId: '2',
-                                        price: '132100',
-                                        amount: '3',
-                                        ProductMainTagId: '3',
-                                        ProductSubTagId: '4',
-                                    },
-                                ],
+                                orderList: orderArr,
                             };
+
                             PostHeaderBodyApi(
                                 '/api/product/purchase',
                                 data,
                                 'Authorization',
                                 accessToken,
-                            ).then(res => {
-                                setModalOrder(true);
-                            });
+                            )
+                                .then(res => {
+                                    setModalOrder(true);
+                                })
+                                .catch(err => {
+                                    console.error(err);
+                                });
                         }
                     } else {
                         // 결제 실패 시 로직,

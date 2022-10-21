@@ -16,7 +16,7 @@ import fetcher from 'utils/fetcher';
 function Cart() {
     const [cartList, setCartList] = useState([]);
     const loginToken = getData().accessToken;
-    // console.log(loginToken);
+
 
     //장바구니 리스트 가져오기
     useEffect(() => {
@@ -25,7 +25,7 @@ function Cart() {
         });
     }, []);
 
-    //장바구니 리스트 삭제
+    //장바구니 리스트
     const { data: shoppingNumber, mutate } = useSWR(
         loginToken ? '/api/shoppingBasket/shoppingList' : null,
         url => fetcher(url, loginToken),
@@ -41,12 +41,7 @@ function Cart() {
         const params = {
             shoppingBasketId: id,
         };
-        DeleteHeaderBodyApi(
-            '/api/shoppingBasket/del',
-            params,
-            'Authorization',
-            loginToken.accessToken,
-        )
+        DeleteHeaderBodyApi('/api/shoppingBasket/del', params, 'Authorization', loginToken)
             .then(res => {
                 const deleteList = cartList.filter(prev => prev.id !== id);
                 setCartList(deleteList);
@@ -81,7 +76,7 @@ function Cart() {
 
     const [modalOrder, setModalOrder] = useState(false);
 
-    const [checkList, setCheckList] = useState({});
+    const [orderArr, setOrderArr] = useState([]);
 
     // 체크
     const checkItem = useCallback(() => {
@@ -106,6 +101,7 @@ function Cart() {
         let arrBsId = [];
         let arrPrice = [];
         let arrAmount = [];
+
         cartList.map(v =>
             v.check
                 ? arrBsId.push(v.id) &&
@@ -116,23 +112,25 @@ function Cart() {
                   arrAmount.filter(f => f !== v.packingAmount),
         );
 
-        setCheckList({ shoppingBasketId: arrBsId, price: arrPrice, amout: arrAmount });
-
-        // console.log('ok', arrBsId, arrPrice, arrAmount);
+        const arr =[];
+        for (let i = 0; i < arrBsId.length; i++) {
+            let obj = {
+                shoppingBasketId: arrBsId[i],
+                price: arrPrice[i],
+                amount: arrAmount[i]
+            };
+            arr.push(obj);
+            setOrderArr(arr);
+        }
     }, [cartList]);
 
-    console.log('check', checkList);
+    // console.log('check', checkList);
+    console.log('order', orderArr);
 
     // 모두 체크 확인 및 총상품 금액
-
-    const [basketId, setBasketId] = useState([]);
-    // console.log(basketId);
-
     useEffect(() => {
-        let arrId = [];
+        let arrId= [];
         cartList.map(v => (v.check ? arrId.push(v.id) : arrId.filter(f => f !== v.id)));
-
-        setBasketId(arrId);
 
         if (cartList.length === arrId.length && cartList.length != 0) setCheckBox(true);
         else setCheckBox(false);
@@ -229,7 +227,7 @@ function Cart() {
                     </CartPayment>
                     <OrderBtn>
                         <button onClick={onClickOrderButton}>결제하기</button>
-                        {order && <Order pay={pay} checkList={checkList} />}
+                        {order && <Order pay={pay} orderArr={orderArr} />}
                     </OrderBtn>
                 </div>
 
