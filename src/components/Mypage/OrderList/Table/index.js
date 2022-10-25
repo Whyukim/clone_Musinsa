@@ -10,19 +10,6 @@ function OrderList({ data }) {
     const [show, setShow] = useState(false);
     const [cancelPay, setCancelPay] = useState(false);
 
-    const orderState = () => {
-        switch (data.state) {
-            case 1:
-                return '주문완료';
-            case 2:
-                return '환불완료';
-        }
-    };
-
-    const onClickCancelPay = useCallback(e => {
-        setShow(true);
-    }, []);
-
     const onCloseModal = useCallback(() => {
         setShow(false);
     }, [show]);
@@ -60,8 +47,8 @@ function OrderList({ data }) {
                 <td>{data.createdAt.substr(0, 10)}</td>
                 <td>{data.id}</td>
                 <td>
-                    {thousandComma(data.orderPrice * data.ProductSubTag.amount)}원<br />
-                    <span>({data.ProductSubTag.amount}개)</span>
+                    {thousandComma(data.orderPrice * data.amount)}원<br />
+                    <span>({data.amount}개)</span>
                 </td>
                 <td colSpan="2">
                     <span>주문완료</span>

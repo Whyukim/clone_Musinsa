@@ -17,7 +17,6 @@ function Cart() {
     const [cartList, setCartList] = useState([]);
     const loginToken = getData().accessToken;
 
-
     //장바구니 리스트 가져오기
     useEffect(() => {
         GetTokenApi('/api/shoppingBasket/shoppingList', loginToken).then(res => {
@@ -112,24 +111,21 @@ function Cart() {
                   arrAmount.filter(f => f !== v.packingAmount),
         );
 
-        const arr =[];
+        const arr = [];
         for (let i = 0; i < arrBsId.length; i++) {
             let obj = {
                 shoppingBasketId: arrBsId[i],
                 price: arrPrice[i],
-                amount: arrAmount[i]
+                amount: arrAmount[i],
             };
             arr.push(obj);
             setOrderArr(arr);
         }
     }, [cartList]);
 
-    // console.log('check', checkList);
-    console.log('order', orderArr);
-
     // 모두 체크 확인 및 총상품 금액
     useEffect(() => {
-        let arrId= [];
+        let arrId = [];
         cartList.map(v => (v.check ? arrId.push(v.id) : arrId.filter(f => f !== v.id)));
 
         if (cartList.length === arrId.length && cartList.length != 0) setCheckBox(true);
@@ -150,10 +146,6 @@ function Cart() {
             );
         } else setSum(0);
     }, [cartList]);
-
-    console.log('cart', cartList);
-    // console.log('prdid', prdId);
-    // console.log('arrId',arrId);
 
     return (
         <>
@@ -227,7 +219,7 @@ function Cart() {
                     </CartPayment>
                     <OrderBtn>
                         <button onClick={onClickOrderButton}>결제하기</button>
-                        {order && <Order pay={pay} orderArr={orderArr} />}
+                        {order && <Order pay={pay} orderArr={orderArr} setOrder={setOrder} />}
                     </OrderBtn>
                 </div>
 
