@@ -10,7 +10,7 @@ import { useScript } from 'hooks/useScript';
 
 const impNumber = process.env.REACT_APP_PAYMENT;
 
-const Order = ({ modal, pay, orderArr, checkList, setOrder }) => {
+const Order = ({ pay, orderArr, setOrder }) => {
     const jQueryScript = useScript('https://code.jquery.com/jquery-1.12.4.min.js');
     const iamportScript = useScript('https://cdn.iamport.kr/js/iamport.payment-1.1.8.js');
 
@@ -22,7 +22,6 @@ const Order = ({ modal, pay, orderArr, checkList, setOrder }) => {
     const { productId } = query;
 
     const [modalOrder, setModalOrder] = useState(false);
-    console.log(123, orderArr);
 
     useEffect(() => {
         if (iamportScript === 'ready' && jQueryScript === 'ready') {
@@ -30,6 +29,7 @@ const Order = ({ modal, pay, orderArr, checkList, setOrder }) => {
             let pay_method = '';
             let price = 0;
 
+            console.log(555, orderArr);
             if (productId == undefined) price = orderArr.reduce((a, b) => a + Number(b.price), 0);
             else price = orderArr.reduce((a, b) => a + Number(b.price) * Number(b.amount), 0);
 
