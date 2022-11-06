@@ -35,7 +35,7 @@ const Header = props => {
     const [open, setOpen] = useState(false);
     const [notice, setNotice] = useState(false);
 
-    const [modalFirst, setModalFirst] = useState(false);
+    const [modalFirst, setModalFirst] = useState(true);
     const onCloseModal = useCallback(() => {
         setModalFirst(false);
     }, []);
@@ -46,13 +46,13 @@ const Header = props => {
     //알림 추가, 더미데이터
     const [noticeList, setNoticeList] = useState([]);
 
-    useEffect(() => {
-        if (window.location.host.includes('local')) return;
+    // useEffect(() => {
+    //     if (window.location.host.includes('local')) return;
 
-        PostQueryApi(`/api/product/productList`).catch(() => {
-            setModalFirst(true);
-        }, []);
-    });
+    //     PostQueryApi(`/api/product/productList`).catch(() => {
+    //         setModalFirst(true);
+    //     }, []);
+    // });
 
     const { data: shoppingNumber, mutate } = useSWR(
         token ? '/api/shoppingBasket/shoppingList' : null,
