@@ -73,8 +73,8 @@ export const ListOuter = styled.li`
         }
 
         img {
-            min-width: 120px;
-            min-height: 145px;
+            max-width: 120px;
+            max-height: 145px;
             object-fit: cover;
         }
     }

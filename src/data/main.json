@@ -1,0 +1,247 @@
+[
+    {
+        "id": 1,
+        "bigCategoryId": 0,
+        "smallCategoryId": 1,
+        "mainSort": 3,
+        "price": 100,
+        "productTitle": "반소매",
+        "like": 101,
+        "view": 100,
+        "comment": 10,
+        "img": "https://images.unsplash.com/photo-1542291026-7eec264c27ff",
+        "imgList": [
+            "https://images.unsplash.com/photo-1542291026-7eec264c27ff",
+            "https://images.unsplash.com/photo-1542291026-7eec264c27ff"
+        ],
+        "productTag": ["x", "xl"],
+        "ProductMainTags": [
+            {
+                "name": "L",
+                "ProductSubTags": [
+                    {
+                        "name": "딥레드",
+                        "amount": 8,
+                        "id": 1
+                    },
+                    {
+                        "name": "블랙",
+                        "amount": 8,
+                        "id": 2
+                    }
+                ]
+            },
+            {
+                "name": "XL",
+                "ProductSubTags": [
+                    {
+                        "name": "블루",
+                        "amount": 8,
+                        "id": 3
+                    },
+                    {
+                        "name": "그린",
+                        "amount": 8,
+                        "id": 4
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "bigCategoryId": 0,
+        "smallCategoryId": 1,
+        "mainSort": 3,
+        "price": 100,
+        "productTitle": "반소매",
+        "like": 100,
+        "view": 100,
+        "comment": 10,
+        "img": "https://images.unsplash.com/photo-1460353581641-37baddab0fa2",
+        "imgList": [
+            "https://images.unsplash.com/photo-1460353581641-37baddab0fa2",
+            "https://images.unsplash.com/photo-1460353581641-37baddab0fa2"
+        ],
+        "productTag": ["x", "xl"],
+        "ProductMainTags": [
+            {
+                "name": "L",
+                "ProductSubTags": [
+                    {
+                        "name": "딥레드",
+                        "amount": 8,
+                        "id": 1
+                    },
+                    {
+                        "name": "블랙",
+                        "amount": 8,
+                        "id": 2
+                    }
+                ]
+            },
+            {
+                "name": "XL",
+                "ProductSubTags": [
+                    {
+                        "name": "블루",
+                        "amount": 8,
+                        "id": 3
+                    },
+                    {
+                        "name": "그린",
+                        "amount": 8,
+                        "id": 4
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": 3,
+        "bigCategoryId": 0,
+        "smallCategoryId": 2,
+        "mainSort": 3,
+        "price": 100,
+        "productTitle": "긴소매",
+        "like": 100,
+        "view": 100,
+        "comment": 10,
+        "img": "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa",
+        "imgList": [
+            "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa",
+            "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa"
+        ],
+        "productTag": ["x", "xl"],
+        "ProductMainTags": [
+            {
+                "name": "L",
+                "ProductSubTags": [
+                    {
+                        "name": "딥레드",
+                        "amount": 8,
+                        "id": 1
+                    },
+                    {
+                        "name": "블랙",
+                        "amount": 8,
+                        "id": 2
+                    }
+                ]
+            },
+            {
+                "name": "XL",
+                "ProductSubTags": [
+                    {
+                        "name": "블루",
+                        "amount": 8,
+                        "id": 3
+                    },
+                    {
+                        "name": "그린",
+                        "amount": 8,
+                        "id": 4
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": 4,
+        "bigCategoryId": 0,
+        "smallCategoryId": 3,
+        "mainSort": 3,
+        "price": 100,
+        "productTitle": "민소매",
+        "like": 80,
+        "view": 100,
+        "comment": 100,
+        "img": "https://images.unsplash.com/photo-1600185365483-26d7a4cc7519",
+        "imgList": [
+            "https://images.unsplash.com/photo-1600185365483-26d7a4cc7519",
+            "https://images.unsplash.com/photo-1600185365483-26d7a4cc7519"
+        ],
+        "productTag": ["x", "xl"],
+        "ProductMainTags": [
+            {
+                "name": "L",
+                "ProductSubTags": [
+                    {
+                        "name": "딥레드",
+                        "amount": 8,
+                        "id": 1
+                    },
+                    {
+                        "name": "블랙",
+                        "amount": 8,
+                        "id": 2
+                    }
+                ]
+            },
+            {
+                "name": "XL",
+                "ProductSubTags": [
+                    {
+                        "name": "블루",
+                        "amount": 8,
+                        "id": 3
+                    },
+                    {
+                        "name": "그린",
+                        "amount": 8,
+                        "id": 4
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": 5,
+        "bigCategoryId": 0,
+        "smallCategoryId": 3,
+        "mainSort": 3,
+        "price": 100,
+        "productTitle": "민소매",
+        "like": 80,
+        "view": 100,
+        "comment": 100,
+        "img": "https://images.unsplash.com/photo-1600185365483-26d7a4cc7519",
+        "imgList": [
+            "https://images.unsplash.com/photo-1600185365483-26d7a4cc7519",
+            "https://images.unsplash.com/photo-1600185365483-26d7a4cc7519"
+        ],
+        "productTag": ["x", "xl"],
+        "ProductMainTags": [
+            {
+                "name": "L",
+                "ProductSubTags": [
+                    {
+                        "name": "딥레드",
+                        "amount": 8,
+                        "id": 1
+                    },
+                    {
+                        "name": "블랙",
+                        "amount": 8,
+                        "id": 2
+                    }
+                ]
+            },
+            {
+                "name": "XL",
+                "ProductSubTags": [
+                    {
+                        "name": "블루",
+                        "amount": 8,
+                        "id": 3
+                    },
+                    {
+                        "name": "그린",
+                        "amount": 8,
+                        "id": 4
+                    }
+                ]
+            }
+        ]
+    }
+]

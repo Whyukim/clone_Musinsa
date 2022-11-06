@@ -17,7 +17,7 @@ const HeaderInfo = () => {
         <Header>
             <CategoryWrapper>
                 <p onClick={() => navigate(`/?bigCategoryId=${detail.product.BigCategoryId}`)}>
-                    {bigCategory[detail.product.BigCategoryId - 1]}
+                    {bigCategory[detail.product.bigCategoryId]}
                 </p>
                 <span> &gt; </span>
                 <p
@@ -27,11 +27,7 @@ const HeaderInfo = () => {
                         )
                     }
                 >
-                    {
-                        smallCategory[detail.product.BigCategoryId - 1][
-                            detail.product.SmallCategoryId
-                        ]
-                    }
+                    {smallCategory[detail.product.bigCategoryId][detail.product.smallCategoryId]}
                 </p>
             </CategoryWrapper>
             <p>{detail.product.productTitle}</p>

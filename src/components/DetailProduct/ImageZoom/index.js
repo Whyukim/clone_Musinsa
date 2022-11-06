@@ -1,4 +1,5 @@
 import { useGlobalState } from 'context/GlobalContext';
+import { useProductDetailState } from 'context/ProductDetailContext';
 import Cookies from 'js-cookie';
 import React from 'react';
 import { useCallback } from 'react';
@@ -12,11 +13,10 @@ import {
 } from './styles';
 
 const ImageZoom = ({ img, alt }) => {
+    const detail = useProductDetailState();
     const { sideBar } = useGlobalState();
-    console.log(sideBar);
 
     const [show, setShow] = useState(false);
-    const [mouseCursor, setMouseCursor] = useState({ x: 0, y: 0 });
     const [mousePosition, setMousePosition] = useState({
         left: 0,
         top: 0,
@@ -45,7 +45,6 @@ const ImageZoom = ({ img, alt }) => {
                     top: -e.pageY + 210 + 'px',
                 });
             }
-            setMouseCursor({ x: e.pageX - 35, y: e.pageY - 20 });
         },
         [sideBar],
     );
@@ -54,6 +53,7 @@ const ImageZoom = ({ img, alt }) => {
         return `?w=${width}&h=${height}&q=${quality}&fm=${format}&fit=crop`;
     }
 
+    console.log(img);
     return (
         <ProductImgContainer>
             <ProductImg show={show} onMouseMove={onMoseMoveZoom} onClick={onClickZoomIn}>

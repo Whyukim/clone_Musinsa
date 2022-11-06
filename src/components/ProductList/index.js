@@ -3,6 +3,7 @@ import { ListOuter, ListWrapper } from './styles';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
 import { AiFillStar } from '@react-icons/all-files/ai/AiFillStar';
+import { useCallback } from 'react';
 
 const ShowList = props => {
     const navigate = useNavigate();
@@ -27,6 +28,10 @@ const ShowList = props => {
         setSelected(newArr);
     };
 
+    function getParametersForUnsplash({ width, height, quality, format }) {
+        return `?w=${width}&h=${height}&q=${quality}&fm=${format}&fit=crop`;
+    }
+
     return (
         <ListWrapper>
             {props.product.length === 0 ? (
@@ -40,10 +45,10 @@ const ShowList = props => {
                     .map((data, idx) => (
                         <ListOuter key={data.id}>
                             <div className="hotItem">
-                                {data.likes > 700 ? <span className="hot">인기 상품</span> : null}
-                                {data.likes < 701 && data.comments > 8000 ? (
+                                {data.like < 101 && data.comment > 80 ? (
                                     <span className="recommend">무신사 추천</span>
                                 ) : null}
+                                {data.like > 100 && <span className="hot">인기 상품</span>}
                             </div>
                             <div
                                 onClick={() => {
@@ -53,8 +58,16 @@ const ShowList = props => {
                                 <div className="li_inner">
                                     <div className="list_img">
                                         <img
-                                            src={`https://musinsa-s3.s3.ap-northeast-2.amazonaws.com/image/${data.ProductImg.src}`}
-                                        ></img>
+                                            src={
+                                                data.img +
+                                                getParametersForUnsplash({
+                                                    width: 116,
+                                                    height: 145,
+                                                    quality: 80,
+                                                    format: 'jpg',
+                                                })
+                                            }
+                                        />
                                     </div>
                                     <div className="item_info">
                                         <p
@@ -66,30 +79,30 @@ const ShowList = props => {
                                         >
                                             {data.productTitle}
                                         </p>
-                                        <p>{data.productPrice.toLocaleString('ko-KR')}원</p>
+                                        <p>{data.price.toLocaleString('ko-KR')}원</p>
                                     </div>
                                     <div className="choice">Members' Choice</div>
                                     <div className="item_like">
                                         <p style={{ color: 'red' }}>❤</p>
-                                        <p className="likes">{data.likes}</p>
+                                        <p className="likes">{data.like}</p>
                                     </div>
                                     <div className="item_comment">
-                                        {data.comments < 100 ? null : data.comments < 2000 ? (
+                                        {data.comment < 2000 ? (
                                             <p style={{ color: '#FF923A' }}>
                                                 <AiFillStar />
                                             </p>
-                                        ) : data.comments < 4000 ? (
+                                        ) : data.comment < 4000 ? (
                                             <p style={{ color: '#FF923A' }}>
                                                 <AiFillStar />
                                                 <AiFillStar />
                                             </p>
-                                        ) : data.comments < 8000 ? (
+                                        ) : data.comment < 8000 ? (
                                             <p style={{ color: '#FF923A' }}>
                                                 <AiFillStar />
                                                 <AiFillStar />
                                                 <AiFillStar />
                                             </p>
-                                        ) : data.comments < 10000 ? (
+                                        ) : data.comment < 10000 ? (
                                             <p style={{ color: '#FF923A' }}>
                                                 <AiFillStar />
                                                 <AiFillStar />
@@ -105,7 +118,7 @@ const ShowList = props => {
                                                 <AiFillStar />
                                             </p>
                                         )}
-                                        <p className="comments">{data.comments}</p>
+                                        <p className="comments">{data.comment}</p>
                                     </div>
                                 </div>
                             </div>
@@ -128,12 +141,12 @@ const ShowList = props => {
                                                 : { display: 'none' }
                                         }
                                     >
-                                        {data.ProductMainTags.map((data, idex) => (
+                                        {data.productTag.map((data, idex) => (
                                             <li
                                                 className={selected[idx] ? 'open' : 'close'}
                                                 key={idex}
                                             >
-                                                <span>{data.name}</span>
+                                                <span>{data}</span>
                                             </li>
                                         ))}
                                     </ul>

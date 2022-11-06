@@ -23,8 +23,9 @@ import { useProductDetailState } from 'context/ProductDetailContext';
 import { ReactComponent as ArrowDown } from 'assets/svg/ArrowDown.svg';
 import { thousandComma } from 'utils/thousandComma';
 import { AiFillStar } from '@react-icons/all-files/ai/AiFillStar';
+import { data } from 'jquery';
 
-const ProductInfoRight = ({ data }) => {
+const ProductInfoRight = () => {
     const detail = useProductDetailState();
     const [toggle, setToggle] = useState(false);
 
@@ -47,6 +48,7 @@ const ProductInfoRight = ({ data }) => {
 
         return value + unitWords[wordCnt];
     }
+    console.log(33333333333, detail.product);
 
     return (
         <div>
@@ -59,13 +61,13 @@ const ProductInfoRight = ({ data }) => {
                     <DetailInfoWrapper>
                         <DetailInfo>
                             <InfoTitle>시즌 / 성별</InfoTitle>
-                            <InfoContent>{detail.product.season}</InfoContent>
+                            <InfoContent>202211</InfoContent>
                             <span>/</span>
                             <InfoContent>{detail.product.gender === 1 ? '남' : '여'}</InfoContent>
                         </DetailInfo>
                         <DetailInfo>
                             <InfoTitle>조회수(1개월)</InfoTitle>
-                            <InfoContent>{roundDown(detail.product.views)}회 이상</InfoContent>
+                            <InfoContent>{roundDown(detail.product.view)}회 이상</InfoContent>
                         </DetailInfo>
                         <DetailInfo>
                             <InfoTitle>좋아요</InfoTitle>
@@ -74,15 +76,14 @@ const ProductInfoRight = ({ data }) => {
                                 style={{ paddingRight: '6px', width: 15, height: 15 }}
                             />
                             <InfoContent style={{ color: 'red' }}>
-                                {detail.product.likes}
+                                {detail.product.like}
                             </InfoContent>
                         </DetailInfo>
                         <DetailInfo>
                             <InfoTitle>구매후기</InfoTitle>
                             <div>
                                 <a href="#estimateBox">
-                                    {detail.product.comments < 100 ? null : detail.product
-                                          .comments < 2000 ? (
+                                    {detail.product.comment < 2000 ? (
                                         <>
                                             <p
                                                 style={{
@@ -94,7 +95,7 @@ const ProductInfoRight = ({ data }) => {
                                             </p>
                                             <span className="review-rating">1.0</span>
                                         </>
-                                    ) : data.comments < 4000 ? (
+                                    ) : detail.product.comment < 4000 ? (
                                         <>
                                             <p
                                                 style={{
@@ -107,7 +108,7 @@ const ProductInfoRight = ({ data }) => {
                                             </p>
                                             <span className="review-rating">2.0</span>
                                         </>
-                                    ) : data.comments < 8000 ? (
+                                    ) : detail.product.comment < 8000 ? (
                                         <>
                                             <p
                                                 style={{
@@ -121,7 +122,7 @@ const ProductInfoRight = ({ data }) => {
                                             </p>
                                             <span className="review-rating">3.0</span>
                                         </>
-                                    ) : data.comments < 10000 ? (
+                                    ) : detail.product.comment < 10000 ? (
                                         <>
                                             <p
                                                 style={{
@@ -154,15 +155,17 @@ const ProductInfoRight = ({ data }) => {
                                         </>
                                     )}
                                     <span className="review-bar">/</span>
-                                    <span className="review-count">후기 9,292개 보기</span>
+                                    <span className="review-count">
+                                        후기 {detail.product.comment}개 보기
+                                    </span>
                                 </a>
                             </div>
                         </DetailInfo>
                         <DetailList>
                             <p>
-                                {detail.product.CustomCategories.map(v => (
+                                {/* {detail.product.CustomCategories.map(v => (
                                     <span key={v.id}>#{v.categoryName}</span>
-                                ))}
+                                ))} */}
                             </p>
                         </DetailList>
                     </DetailInfoWrapper>
@@ -175,19 +178,15 @@ const ProductInfoRight = ({ data }) => {
                     <DetailInfoWrapper>
                         <DetailInfo>
                             <InfoTitle>출고 정보</InfoTitle>
-                            <InfoContent>{data.beReleased}</InfoContent>
+                            <InfoContent>전국 3일 이내 출고</InfoContent>
                         </DetailInfo>
                         <DetailInfo>
                             <InfoTitle>배송 방법</InfoTitle>
-                            <InfoContent>
-                                {detail.product.deliveryFrom ? '해외' : '국내'}
-                            </InfoContent>
+                            <InfoContent>국내</InfoContent>
                             <span>/</span>
-                            <InfoContent>
-                                {detail.product.deliveryWay ? '무신사 직배송' : '입점사 배송'}
-                            </InfoContent>
+                            <InfoContent>무신사 직배송</InfoContent>
                             <span>/</span>
-                            <InfoContent>{detail.product.deliveryCompany}</InfoContent>
+                            <InfoContent>CJ대한통운</InfoContent>
                         </DetailInfo>
                     </DetailInfoWrapper>
                 </InfoWrapper>
@@ -200,14 +199,14 @@ const ProductInfoRight = ({ data }) => {
                         <DetailInfo>
                             <PriceTitle>무신사 판매가</PriceTitle>
                             <PriceContent className="line">
-                                {thousandComma(detail.product.productPrice)}
+                                {thousandComma(detail.product.price + 100)}
                                 <Price>원</Price>
                             </PriceContent>
                         </DetailInfo>
                         <DetailInfo>
                             <PriceTitle>무신사 회원가</PriceTitle>
                             <PriceContent onClick={onToggle}>
-                                {thousandComma(detail.product.rookiePrice)}
+                                {thousandComma(detail.product.price)}
                                 <Price>원</Price>
                                 <ArrowDown style={{ paddingLeft: '8px' }} />
                             </PriceContent>
@@ -220,7 +219,7 @@ const ProductInfoRight = ({ data }) => {
                     </TextBox>
                 </InfoWrapper>
             </ProductInfo>
-            <PurchaseForm data={data} />
+            <PurchaseForm />
         </div>
     );
 };

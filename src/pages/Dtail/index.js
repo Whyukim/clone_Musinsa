@@ -16,6 +16,7 @@ import Header from 'layouts/Header';
 import Sidebar from 'layouts/Sidebar';
 import DialLog from 'layouts/DialLog';
 import { Oval } from 'react-loader-spinner';
+import itemData from 'data/main.json';
 
 const dummyProduct = {
     BigCategoryName: '상의',
@@ -90,23 +91,16 @@ const DetailProduct = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const asyncFunction = async () => {
-            try {
-                const result = await GetApi(
-                    `/api/product/productDetail?productId=${query.productId}`,
-                );
-                setInitialProduceDetail(prev => ({
-                    ...prev,
-                    product: result.data.product,
-                }));
+        // const result = await GetApi(
+        //     `/api/product/productDetail?productId=${}`,
+        // );
+        const item = itemData.filter(v => v.id === Number(query.productId))[0];
+        setInitialProduceDetail(prev => ({
+            ...prev,
+            product: item,
+        }));
 
-                setLoading(false);
-            } catch (error) {
-                console.error(error);
-            }
-        };
-
-        asyncFunction();
+        setLoading(false);
     }, []);
 
     if (loading) {
@@ -127,8 +121,8 @@ const DetailProduct = () => {
                     <DetailWrapper>
                         <HeaderInfo />
                         <ProductWrapper>
-                            <ProductInfoLeft data={dummyProduct} />
-                            <ProductInfoRight data={dummyProduct} />
+                            <ProductInfoLeft />
+                            <ProductInfoRight />
                         </ProductWrapper>
                     </DetailWrapper>
                     <ProductInfo />

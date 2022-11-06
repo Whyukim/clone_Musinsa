@@ -226,8 +226,7 @@ const PurchaseForm = () => {
 
     const totalPrice = useMemo(() => {
         return selectArr.length > 0
-            ? selectArr?.map(v => Number(v[2]))?.reduce((a, b) => a + b) *
-                  detail.product.rookiePrice
+            ? selectArr?.map(v => Number(v[2]))?.reduce((a, b) => a + b) * detail.product.price
             : 0;
     }, [selectArr]);
 
@@ -436,7 +435,7 @@ const PurchaseForm = () => {
                                 </ul>
                             </div>
                             <div>
-                                <div>{thousandComma(count * detail.product.rookiePrice)}원</div>
+                                <div>{thousandComma(count * detail.product.price)}원</div>
                                 <p onClick={() => onClickRemove(idx)}>X</p>
                             </div>
                         </SelectedOption>
@@ -453,7 +452,7 @@ const PurchaseForm = () => {
                 {order && <Order pay={pay} orderArr={orderArr} setOrder={setOrder} />}
                 <ButtonLike clickedlike={clickedlike} onClick={onLikeClicked}>
                     <Button clickedlike={clickedlike} />
-                    <Like clickedlike={clickedlike}>{thousandComma(detail.product.likes)}</Like>
+                    <Like clickedlike={clickedlike}>{thousandComma(detail.product.like)}</Like>
                 </ButtonLike>
                 <ButtonCart onClick={onClickBasket}>
                     <i>장바구니 아이콘</i>
