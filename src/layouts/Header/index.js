@@ -22,7 +22,7 @@ import { AiOutlineSearch } from '@react-icons/all-files/ai/AiOutlineSearch';
 import { IoMdArrowDropup } from '@react-icons/all-files/io/IoMdArrowDropup';
 import { FaCommentsDollar } from 'react-icons/fa';
 
-import { useMainState, useMainDispatch, SEARCH } from 'context/MainContext';
+import { useMainState, useMainDispatch, SEARCH, INIT } from 'context/MainContext';
 import { ALL, TITLE } from 'context/MainContext';
 import NoticeList from 'components/NoticeList';
 import { useMemo } from 'react';
@@ -80,6 +80,8 @@ const Header = props => {
             dispatch({ type: SEARCH, payload });
             setInputValue('');
             setOpen(false);
+
+            navigate('/');
         },
         [search, inputValue],
     );
@@ -121,17 +123,8 @@ const Header = props => {
     }, [login]);
 
     const goMain = () => {
+        dispatch({ type: INIT });
         navigate('/');
-        const payload = {
-            bigCategoryId: 0,
-            smallCategoryId: 0,
-            mainSort: 0,
-            price: 0,
-            priceMin: 0,
-            priceMax: 0,
-            productTitle: '',
-        };
-        dispatch({ type: ALL, payload });
     };
 
     const onClickNotice = useCallback(async () => {

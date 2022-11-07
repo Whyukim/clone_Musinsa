@@ -8,10 +8,12 @@ import { RiArrowDownSLine } from '@react-icons/all-files/ri/RiArrowDownSLine';
 import { RiArrowUpSLine } from '@react-icons/all-files/ri/RiArrowUpSLine';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import UrlCopyModal from 'components/Modals/UrlCopyModal';
+import { INIT, useMainDispatch } from 'context/MainContext';
 
 const DialLog = props => {
     const saveUrl = useLocation();
     const navigate = useNavigate();
+    const dispatch = useMainDispatch();
 
     // 다이얼 로그
     const [basic, setBasic] = useState({
@@ -47,12 +49,7 @@ const DialLog = props => {
     };
 
     const scrollBtm = () => {
-        // window.scroll({
-        // 	bottom: document.body.scrollHeight,
-        // 	behavior: 'smooth',
-        // });
         btm.current.scrollIntoView();
-        console.log(document.body.scrollHeight);
     };
 
     return (
@@ -65,7 +62,12 @@ const DialLog = props => {
                             : { boxShadow: 'inset 0px 0px 4px 1px rgba(0,0,255,0.5)' }
                     }
                 >
-                    <Link to="/">
+                    <Link
+                        to="/"
+                        onClick={() => {
+                            dispatch({ type: INIT });
+                        }}
+                    >
                         <button type="button">
                             {basic.home ? (
                                 <BiHomeCircle />

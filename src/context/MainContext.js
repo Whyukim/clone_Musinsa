@@ -11,6 +11,7 @@ const initialFilterVal = {
     search: '',
 };
 
+export const INIT = 'INIT';
 export const ALL = 'ALL';
 export const CATEGORY = 'CATEGORY';
 export const MAINSORT = 'MAINSORT';
@@ -21,6 +22,8 @@ export const SEARCH = 'SEARCH';
 
 function MainReducer(state, action) {
     switch (action.type) {
+        case INIT:
+            return initialFilterVal;
         case ALL:
             return {
                 ...state,

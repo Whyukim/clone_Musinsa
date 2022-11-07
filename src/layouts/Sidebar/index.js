@@ -29,13 +29,6 @@ const Sidebar = props => {
 
     //Main - filterVal 수정 등
     const sendSmallCate = (big, small) => {
-        const newArr = props.clickSideBar;
-        if (props.clickSideBar.includes(true)) {
-            newArr[props.clickSideBar.indexOf(true)] = false;
-        }
-        newArr[small] = true;
-        props.setClickSideBar(() => newArr);
-
         const { pathname } = location;
 
         if (pathname !== '/detail') {
@@ -135,7 +128,8 @@ const Sidebar = props => {
                                         <span
                                             key={idex}
                                             className={
-                                                state.smallCategoryId === idex
+                                                state.smallCategoryId === idex &&
+                                                state.bigCategoryId - 1 === idx
                                                     ? 'active'
                                                     : 'inactive'
                                             }
