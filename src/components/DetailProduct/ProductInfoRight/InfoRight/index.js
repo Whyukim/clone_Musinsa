@@ -48,7 +48,6 @@ const ProductInfoRight = () => {
 
         return value + unitWords[wordCnt];
     }
-    console.log(33333333333, detail.product);
 
     return (
         <div>
@@ -161,13 +160,13 @@ const ProductInfoRight = () => {
                                 </a>
                             </div>
                         </DetailInfo>
-                        <DetailList>
+                        {/* <DetailList>
                             <p>
-                                {/* {detail.product.CustomCategories.map(v => (
+                                {detail.product.CustomCategories.map(v => (
                                     <span key={v.id}>#{v.categoryName}</span>
-                                ))} */}
+                                ))}
                             </p>
-                        </DetailList>
+                        </DetailList> */}
                     </DetailInfoWrapper>
                 </InfoWrapperProduct>
                 <InfoWrapper>

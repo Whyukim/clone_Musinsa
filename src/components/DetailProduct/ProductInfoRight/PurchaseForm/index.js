@@ -29,6 +29,7 @@ import Cookies from 'js-cookie';
 import { useMemo } from 'react';
 import useSWR from 'swr';
 import fetcher from 'utils/fetcher';
+import { setData } from 'utils/setData';
 
 const PurchaseForm = () => {
     const navigate = useNavigate();
@@ -37,9 +38,13 @@ const PurchaseForm = () => {
     const detail = useProductDetailState();
     const dispatch = useProductDetailDispatch();
     const user = getData();
-    const loginToken = getData()?.accessToken;
+    const [loginToken, setLoginToken] = useState(() => {
+        return getData();
+    });
 
-    const [clickedlike, setClickedlike] = useState(false);
+    const [clickedlike, setClickedlike] = useState(() => {
+        return loginToken && loginToken.likes.includes(Number(query.productId));
+    });
 
     const [optionData, setOptionData] = useState({
         option1: '옵션 선택',
@@ -57,15 +62,6 @@ const PurchaseForm = () => {
 
     const [modalOrder, setModalOrder] = useState(false);
     const [modalBasket, setModalBasket] = useState(false);
-
-    //장바구니 리스트
-    const { data: shoppingNumber, mutate } = useSWR(
-        loginToken ? '/api/shoppingBasket/shoppingList' : null,
-        url => fetcher(url, loginToken),
-        {
-            refreshInterval: 0,
-        },
-    );
 
     // 데이터 구조 변경
     const optionDataStructureChange = useCallback(() => {
@@ -238,40 +234,19 @@ const PurchaseForm = () => {
             navigate(`/login`);
         }
 
-        const token = user.accessToken;
-
         setClickedlike(prev => !prev);
+
         if (clickedlike) {
-            changeDispatch(LIKES, {
-                likes: detail.product.likes - 1,
-            });
-            detail.product.likes -= 1;
-            try {
-                const params = {
-                    productId: query.productId,
-                };
-                await DeleteHeaderBodyApi(
-                    '/api/mypage/favoriteGoods/del',
-                    params,
-                    'Authorization',
-                    token,
-                );
-            } catch (error) {
-                setClickedlike(true);
-            }
+            const temp = loginToken.likes.filter(v => v !== Number(query.productId));
+            let data = loginToken;
+            data.likes = temp;
+            setData(data);
         } else {
-            changeDispatch(LIKES, {
-                likes: detail.product.likes + 1,
-            });
-            detail.product.likes += 1;
-            try {
-                const params = {
-                    productId: query.productId,
-                };
-                PostHeaderBodyApi('/api/product/likeProduct', params, 'Authorization', token);
-            } catch (error) {
-                setClickedlike(false);
-            }
+            const temp = loginToken.likes;
+            temp.push(Number(query.productId));
+            let data = loginToken;
+            data.likes = temp;
+            setData(data);
         }
     }, [clickedlike]);
 
@@ -283,29 +258,28 @@ const PurchaseForm = () => {
             navigate(`/login`);
         }
 
-        const addCarts = [];
-        for (let list of selectArr) {
-            const obj = {
-                productId: query.productId,
-                mainTagId: Number(list[0]),
-                subTagId: Number(list[1]),
-                packingAmount: list[2],
-            };
-            addCarts.push(obj);
-        }
+        // const addCarts = [];
+        // for (let list of selectArr) {
+        //     const obj = {
+        //         productId: query.productId,
+        //         mainTagId: Number(list[0]),
+        //         subTagId: Number(list[1]),
+        //         packingAmount: list[2],
+        //     };
+        //     addCarts.push(obj);
+        // }
 
-        const token = user.accessToken;
-        try {
-            const params = {
-                addCarts,
-            };
-            await PostHeaderBodyApi('/api/product/addCart', params, 'Authorization', token);
-            setModalBasket(true);
-            mutate();
-        } catch (error) {
-            alert('이미 추가된 카테고리입니다');
-            console.error(error);
-        }
+        // const token = user.accessToken;
+        // try {
+        //     const params = {
+        //         addCarts,
+        //     };
+        //     await PostHeaderBodyApi('/api/product/addCart', params, 'Authorization', token);
+        //     setModalBasket(true);
+        // } catch (error) {
+        //     alert('이미 추가된 카테고리입니다');
+        //     console.error(error);
+        // }
     }, [selectArr]);
 
     const onCloseModal = useCallback(() => {
@@ -329,19 +303,19 @@ const PurchaseForm = () => {
 
         if (selectArr.length === 0) return alert('구매하실 상품이 없습니다.');
 
-        const orderList = [];
-        for (let list of selectArr) {
-            const obj = {
-                ProductId: query.productId,
-                price: String(detail.product.rookiePrice),
-                amount: String(list[2]),
-                ProductMainTagId: list[0],
-                ProductSubTagId: list[1],
-            };
-            orderList.push(obj);
-        }
+        // const orderList = [];
+        // for (let list of selectArr) {
+        //     const obj = {
+        //         ProductId: query.productId,
+        //         price: String(detail.product.rookiePrice),
+        //         amount: String(list[2]),
+        //         ProductMainTagId: list[0],
+        //         ProductSubTagId: list[1],
+        //     };
+        //     orderList.push(obj);
+        // }
 
-        setOrderArr(orderList);
+        // setOrderArr(orderList);
         setModalOrder(true);
     }, [selectArr]);
 
