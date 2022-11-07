@@ -45,10 +45,10 @@ const ShowList = props => {
                     .map((data, idx) => (
                         <ListOuter key={data.id}>
                             <div className="hotItem">
-                                {data.like < 101 && data.comment > 80 ? (
+                                {data.like < 10000 && data.comment > 6000 ? (
                                     <span className="recommend">무신사 추천</span>
                                 ) : null}
-                                {data.like > 100 && <span className="hot">인기 상품</span>}
+                                {data.like > 10000 && <span className="hot">인기 상품</span>}
                             </div>
                             <div
                                 onClick={() => {

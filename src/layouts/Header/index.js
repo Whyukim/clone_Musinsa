@@ -46,14 +46,6 @@ const Header = props => {
     //알림 추가, 더미데이터
     const [noticeList, setNoticeList] = useState([]);
 
-    // useEffect(() => {
-    //     if (window.location.host.includes('local')) return;
-
-    //     PostQueryApi(`/api/product/productList`).catch(() => {
-    //         setModalFirst(true);
-    //     }, []);
-    // });
-
     const { data: shoppingNumber, mutate } = useSWR(
         token ? '/api/shoppingBasket/shoppingList' : null,
         url => fetcher(url, token),
@@ -342,7 +334,7 @@ const Header = props => {
                 </HDiv>
             </HContainer>
 
-            <FirstModal show={modalFirst} onCloseModal={onCloseModal}></FirstModal>
+            {/* <FirstModal show={modalFirst} onCloseModal={onCloseModal}></FirstModal> */}
         </>
     );
 };

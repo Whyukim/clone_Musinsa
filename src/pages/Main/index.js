@@ -317,6 +317,8 @@ const Main = () => {
                 priceArr[val - 1].replaceAll('원', '').replaceAll(',', '').trim().split('~')[1],
             );
 
+            if (min.current && !max.current) max.current = 10000;
+
             if (!category.current) {
                 const data = itemData.filter(v =>
                     v.price > min.current && v.price <= max.current ? true : false,
@@ -374,6 +376,7 @@ const Main = () => {
                 return 1;
             }
         });
+        setProduct(data);
     };
 
     // //검색창 input들 state
@@ -383,7 +386,6 @@ const Main = () => {
     // }, [])
     const [minPriceInput, onChangeClickPrice, setMinPriceInput] = useInput(0);
     const [maxPriceInput, onChangeMaxPriceInput, setMaxPriceInput] = useInput(0);
-    console.log(minPriceInput);
 
     // //검색창 select박스 reset
     // const onResetSearch = () => {

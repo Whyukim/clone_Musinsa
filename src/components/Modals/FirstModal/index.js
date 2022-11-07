@@ -1,9 +1,6 @@
 import FirstModalContainer from '../FirstModalContainer';
 import { Button, Container } from 'components/Modals/FirstModalContainer/style';
 import React from 'react';
-import error1 from 'assets/images/error_1.png';
-import error2 from 'assets/images/error_2.png';
-import error3 from 'assets/images/error_3.png';
 
 const FirstModal = ({ show, onCloseModal }) => {
     return (

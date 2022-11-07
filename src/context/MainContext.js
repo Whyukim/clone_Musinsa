@@ -1,7 +1,7 @@
 import React, { useReducer, createContext, useContext } from 'react';
 
 const initialFilterVal = {
-    bigCategoryId: 0,
+    bigCategoryId: 1,
     smallCategoryId: 0,
     mainSort: 0,
     price: 0,
