@@ -15,57 +15,71 @@ import fetcher from 'utils/fetcher';
 
 function Cart() {
     const [cartList, setCartList] = useState([]);
-    const loginToken = getData().accessToken;
+    const loginToken = getData();
 
     //장바구니 리스트 가져오기
     useEffect(() => {
-        GetTokenApi('/api/shoppingBasket/shoppingList', loginToken).then(res => {
-            setCartList(res.data.map(item => Object.assign(item, { check: false })));
-        });
+        setCartList([...loginToken.baskets]);
     }, []);
 
     //장바구니 리스트
-    const { data: shoppingNumber, mutate } = useSWR(
-        loginToken ? '/api/shoppingBasket/shoppingList' : null,
-        url => fetcher(url, loginToken),
-        {
-            refreshInterval: 0,
-        },
-    );
+    // const { data: shoppingNumber, mutate } = useSWR(
+    //     loginToken ? '/api/shoppingBasket/shoppingList' : null,
+    //     url => fetcher(url, loginToken),
+    //     {
+    //         refreshInterval: 0,
+    //     },
+    // );
 
     const cartRemove = useCallback(id => {
         const originList = setCartList(cartList);
         const deleteList = cartList.filter(prev => prev.id !== id);
         setCartList(deleteList);
-        const params = {
-            shoppingBasketId: id,
-        };
-        DeleteHeaderBodyApi('/api/shoppingBasket/del', params, 'Authorization', loginToken)
-            .then(res => {
-                const deleteList = cartList.filter(prev => prev.id !== id);
-                setCartList(deleteList);
-                mutate();
-            })
-            .catch(err => {
-                switch (err.request.status) {
-                    case 400:
-                        console.log('입력값을 다시 확인해주세요');
-                        break;
-                    case 401:
-                        console.log('유저의 조회 결과가 없습니다');
-                        break;
-                    case 402:
-                        console.log('장바구니에 없는 상품을 삭제 시도하셨습니다');
-                        break;
-                    case 500:
-                        console.log('서버 에러');
-                        break;
-                }
-                console.log('실패', err);
-                // 안지워졌을시 필터했던 아이템 다시 추가
-                setCartList(originList);
-            });
-    });
+        console.log(deleteList);
+
+        // const temp = loginData.baskets.map(v => {
+        //     if (v.productId === item.productId)
+        //         return {
+        //             ...v,
+        //             count: Number(value),
+        //         };
+        //     else return v;
+        // });
+        // setCartList(temp);
+
+        // let data = loginData;
+        // data.baskets = temp;
+        // setData(data);
+        // const params = {
+
+        //     shoppingBasketId: id,
+        // };
+        // DeleteHeaderBodyApi('/api/shoppingBasket/del', params, 'Authorization', loginToken)
+        //     .then(res => {
+        //         const deleteList = cartList.filter(prev => prev.id !== id);
+        //         setCartList(deleteList);
+        //         mutate();
+        //     })
+        //     .catch(err => {
+        //         switch (err.request.status) {
+        //             case 400:
+        //                 console.log('입력값을 다시 확인해주세요');
+        //                 break;
+        //             case 401:
+        //                 console.log('유저의 조회 결과가 없습니다');
+        //                 break;
+        //             case 402:
+        //                 console.log('장바구니에 없는 상품을 삭제 시도하셨습니다');
+        //                 break;
+        //             case 500:
+        //                 console.log('서버 에러');
+        //                 break;
+        //         }
+        //         console.log('실패', err);
+        //         // 안지워졌을시 필터했던 아이템 다시 추가
+        //         setCartList(originList);
+        //     });
+    }, []);
 
     const [checkBox, setCheckBox] = useState(false);
     const [sum, setSum] = useState(0);
@@ -80,7 +94,7 @@ function Cart() {
     // 체크
     const checkItem = useCallback(() => {
         setCheckBox(check => !check);
-        setCartList(cartList => cartList.map(item => ({ ...item, check: !checkBox })));
+        // setCartList(cartList => cartList.map(item => ({ ...item, check: !checkBox })));
     }, [cartList, checkBox]);
 
     const onCloseModal = useCallback(() => {
@@ -101,15 +115,15 @@ function Cart() {
         let arrPrice = [];
         let arrAmount = [];
 
-        cartList.map(v =>
-            v.check
-                ? arrBsId.push(v.id) &&
-                  arrPrice.push(v.Product.productPrice * v.packingAmount) &&
-                  arrAmount.push(v.packingAmount)
-                : arrBsId.filter(f => f !== v.id) &&
-                  arrPrice.filter(f => f !== v.Product.productPrice * v.packingAmount) &&
-                  arrAmount.filter(f => f !== v.packingAmount),
-        );
+        // cartList.map(v =>
+        //     v.check
+        //         ? arrBsId.push(v.id) &&
+        //           arrPrice.push(v.Product.productPrice * v.packingAmount) &&
+        //           arrAmount.push(v.packingAmount)
+        //         : arrBsId.filter(f => f !== v.id) &&
+        //           arrPrice.filter(f => f !== v.Product.productPrice * v.packingAmount) &&
+        //           arrAmount.filter(f => f !== v.packingAmount),
+        // );
 
         const arr = [];
         for (let i = 0; i < arrBsId.length; i++) {
@@ -126,7 +140,7 @@ function Cart() {
     // 모두 체크 확인 및 총상품 금액
     useEffect(() => {
         let arrId = [];
-        cartList.map(v => (v.check ? arrId.push(v.id) : arrId.filter(f => f !== v.id)));
+        // cartList.map(v => (v.check ? arrId.push(v.id) : arrId.filter(f => f !== v.id)));
 
         if (cartList.length === arrId.length && cartList.length != 0) setCheckBox(true);
         else setCheckBox(false);

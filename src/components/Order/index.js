@@ -14,24 +14,12 @@ const Order = ({ pay, orderArr, setOrder }) => {
     const jQueryScript = useScript('https://code.jquery.com/jquery-1.12.4.min.js');
     const iamportScript = useScript('https://cdn.iamport.kr/js/iamport.payment-1.1.8.js');
 
-    const data = getData();
-    const { accessToken } = data;
-
-    const location = useLocation();
-    const query = URLquery(location);
-    const { productId } = query;
-
     const [modalOrder, setModalOrder] = useState(false);
 
     useEffect(() => {
         if (iamportScript === 'ready' && jQueryScript === 'ready') {
             let pg = '';
-            let pay_method = '';
-            let price = 0;
-
-            console.log(555, orderArr);
-            if (productId == undefined) price = orderArr.reduce((a, b) => a + Number(b.price), 0);
-            else price = orderArr.reduce((a, b) => a + Number(b.price) * Number(b.amount), 0);
+            let price = 10;
 
             if (pay === 'card') pg = 'html5_inicis';
             else if (pay === 'kakao') pg = 'kakaopay';
@@ -46,7 +34,7 @@ const Order = ({ pay, orderArr, setOrder }) => {
                     merchant_uid: `mid_${new Date().getTime()}`,
                     name: 'Test 상품',
                     amount: price,
-                    buyer_email: 'devhyuktest@gmail.com',
+                    buyer_email: 'test@test.com',
                     buyer_name: '홍길동',
                     buyer_tel: '01096361038',
                     buyer_addr: '서울특별시 강남구 신사동',
@@ -56,43 +44,7 @@ const Order = ({ pay, orderArr, setOrder }) => {
                     // callback
                     if (rsp.success) {
                         // 결제 성공 시 로직,
-                        if (productId == undefined) {
-                            const data = {
-                                purchasedDataList: orderArr,
-                                merchant_uid: rsp.merchant_uid,
-                                imp_uid: rsp.imp_uid,
-                            };
-
-                            PostHeaderBodyApi(
-                                '/api/shoppingBasket/purchase',
-                                data,
-                                'Authorization',
-                                accessToken,
-                            ).then(res => {
-                                setModalOrder(true);
-                            });
-                        } else {
-                            const data = {
-                                authPayment: {
-                                    imp_uid: rsp.imp_uid,
-                                    Merchant_uid: rsp.merchant_uid,
-                                },
-                                orderList: orderArr,
-                            };
-
-                            PostHeaderBodyApi(
-                                '/api/product/purchase',
-                                data,
-                                'Authorization',
-                                accessToken,
-                            )
-                                .then(res => {
-                                    setModalOrder(true);
-                                })
-                                .catch(err => {
-                                    console.error(err);
-                                });
-                        }
+                        setModalOrder(true);
                     } else {
                         // 결제 실패 시 로직,
                         setOrder(false);

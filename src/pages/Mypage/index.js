@@ -53,41 +53,49 @@ const Mypage = () => {
             <MainHeader />
             <MypageLayout>
                 <MyHeader />
-                <StyleNav>
-                    <h3>나의 쇼핑 활동</h3>
-                    <ul>
-                        <li>
-                            <NavLink
-                                exact
-                                to="/mypage/orderlist"
-                                style={({ isActive }) => ({ color: isActive ? 'black' : 'gray' })}
-                            >
-                                주문 내역 조회
-                            </NavLink>
-                        </li>
-                        <li>
-                            <NavLink
-                                to="/mypage/like"
-                                style={({ isActive }) => ({ color: isActive ? 'black' : 'gray' })}
-                            >
-                                좋아요
-                            </NavLink>
-                        </li>
-                        <li>
-                            <NavLink
-                                to="/mypage/cart"
-                                style={({ isActive }) => ({ color: isActive ? 'black' : 'gray' })}
-                            >
-                                장바구니
-                            </NavLink>
-                        </li>
-                    </ul>
-                </StyleNav>
+                {
+                    <StyleNav>
+                        <h3>나의 쇼핑 활동</h3>
+                        <ul>
+                            <li>
+                                <NavLink
+                                    exact
+                                    to="/mypage/orderlist"
+                                    style={({ isActive }) => ({
+                                        color: isActive ? 'black' : 'gray',
+                                    })}
+                                >
+                                    주문 내역 조회
+                                </NavLink>
+                            </li>
+                            <li>
+                                <NavLink
+                                    to="/mypage/like"
+                                    style={({ isActive }) => ({
+                                        color: isActive ? 'black' : 'gray',
+                                    })}
+                                >
+                                    좋아요
+                                </NavLink>
+                            </li>
+                            <li>
+                                <NavLink
+                                    to="/mypage/cart"
+                                    style={({ isActive }) => ({
+                                        color: isActive ? 'black' : 'gray',
+                                    })}
+                                >
+                                    장바구니
+                                </NavLink>
+                            </li>
+                        </ul>
+                    </StyleNav>
+                }
                 <div>
                     <Routes>
-                        <Route path="/orderlist" element={<OrderList />} /> {/* => 주문내역조회 */}
-                        <Route path="/like" element={<Like />} /> {/* => 좋아요페이지 */}
-                        <Route path="/cart" element={<Cart />} /> {/* => 장바구니페이지 */}
+                        <Route path="/orderlist" element={<OrderList />} />
+                        <Route path="/like" element={<Like />} />
+                        <Route path="/cart" element={<Cart />} />
                     </Routes>
                 </div>
             </MypageLayout>

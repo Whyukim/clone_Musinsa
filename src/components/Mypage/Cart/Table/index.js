@@ -9,26 +9,44 @@ import { bigCategory } from 'utils/bigCategory';
 import { CheckLabel, ItemUl } from './styles';
 import OrderModal from 'components/Modals/OrderModal';
 import Order from 'components/Order';
+import itemData from 'data/main.json';
+import { getData } from 'utils/getData';
+import { setData } from 'utils/setData';
 
 function CartTable({ item, setCartList, cartList, cartRemove }) {
     const [modalOrder, setModalOrder] = useState(false);
     const [pay, setPay] = useState('card');
     const [order, setOrder] = useState(false);
     const [orderArr, setOrderArr] = useState([]);
-    const id = item.id;
-    const amountValue = item.ProductSubTag.amount == 0 ? 0 : item.packingAmount;
+    const amountValue = item.count == 0 ? 0 : item.count;
+    const [productItem, setProductItem] = useState(() => {
+        return itemData.filter(v => item.id === v.id)[0];
+    });
+    const [loginData, setLoginData] = useState(() => {
+        return getData();
+    });
 
     // 수량 기입
     const handleChange = useCallback(
         ({ target: { value } }) => {
-            if (value > item.ProductSubTag.amount) {
+            if (value > item.amount) {
                 alert('상품의 재고보다 많은 수량을 선택할 수 없습니다');
             } else if (value == 0) {
                 alert('수량을 줄일 수 없습니다.');
             } else {
-                setCartList(prev =>
-                    prev.map(v => (v.id === item.id ? { ...v, packingAmount: Number(value) } : v)),
-                );
+                const temp = loginData.baskets.map(v => {
+                    if (v.productId === item.productId)
+                        return {
+                            ...v,
+                            count: Number(value),
+                        };
+                    else return v;
+                });
+                setCartList(temp);
+
+                let data = loginData;
+                data.baskets = temp;
+                setData(data);
             }
         },
         [cartList],
@@ -36,14 +54,22 @@ function CartTable({ item, setCartList, cartList, cartRemove }) {
 
     // 수량 증가
     const plusCount = useCallback(() => {
-        if (amountValue >= item.ProductSubTag.amount) {
+        if (amountValue >= item.amount) {
             alert('상품의 재고보다 많은 수량을 선택할 수 없습니다');
         } else {
-            setCartList(prev =>
-                prev.map(v =>
-                    v.id === item.id ? { ...v, packingAmount: v.packingAmount + 1 } : v,
-                ),
-            );
+            const temp = loginData.baskets.map(v => {
+                if (v.productId === item.productId)
+                    return {
+                        ...v,
+                        count: amountValue + 1,
+                    };
+                else return v;
+            });
+            setCartList(temp);
+
+            let data = loginData;
+            data.baskets = temp;
+            setData(data);
         }
     }, [cartList]);
 
@@ -52,19 +78,43 @@ function CartTable({ item, setCartList, cartList, cartRemove }) {
         if (amountValue === 1) {
             alert('수량을 줄일 수 없습니다.');
         } else {
-            setCartList(prev =>
-                prev.map(v =>
-                    v.id === item.id ? { ...v, packingAmount: v.packingAmount - 1 } : v,
-                ),
-            );
+            const temp = loginData.baskets.map(v => {
+                if (v.productId === item.productId)
+                    return {
+                        ...v,
+                        count: amountValue - 1,
+                    };
+                else return v;
+            });
+            setCartList(temp);
+
+            let data = loginData;
+            data.baskets = temp;
+            setData(data);
         }
     }, [cartList]);
 
     // 체크
     const checkItem = useCallback(() => {
-        item.ProductSubTag.amount > 0
-            ? setCartList(prev => prev.map(v => (v.id === item.id ? { ...v, check: !v.check } : v)))
-            : setCartList(cartList);
+        if (item.count > 0) {
+            const temp = cartList.map(v =>
+                v.productId === item.productId ? { ...v, check: !v.check } : v,
+            );
+            setCartList(temp);
+
+            let data = loginData;
+            data.baskets = temp;
+            setData(data);
+        }
+    }, [cartList]);
+
+    const removeItem = useCallback(() => {
+        const temp = cartList.filter(v => v.productId !== item.productId);
+        setCartList(temp);
+
+        let data = loginData;
+        data.baskets = temp;
+        setData(data);
     }, [cartList]);
 
     // 결제 모달창
@@ -76,9 +126,12 @@ function CartTable({ item, setCartList, cartList, cartRemove }) {
     // 바로구매
     const onClickOrderButton = useCallback(() => {
         let obj = {
-            shoppingBasketId: item.id,
-            price: item.Product.productPrice * amountValue,
-            amount: amountValue,
+            id: item.id,
+            productId: item.productId,
+            price: productItem.price * amountValue,
+            count: amountValue,
+            size: item.size,
+            name: item.name,
         };
         const orderList = [obj];
 
@@ -92,7 +145,9 @@ function CartTable({ item, setCartList, cartList, cartRemove }) {
         setOrder(true);
     }, []);
 
-    const dlvChr = thousandComma(3000);
+    function getParametersForUnsplash({ width, height, quality, format }) {
+        return `?w=${width}&h=${height}&q=${quality}&fm=${format}&fit=crop`;
+    }
 
     return (
         <tbody>
@@ -113,55 +168,52 @@ function CartTable({ item, setCartList, cartList, cartRemove }) {
                                 <td onClick={checkItem}>
                                     <CheckLabel
                                         className={
-                                            item.ProductSubTag.amount > 0
-                                                ? item.check
-                                                    ? 'active'
-                                                    : ''
-                                                : 'sold'
+                                            item.amount > 0 ? (item.check ? 'active' : '') : 'sold'
                                         }
                                     ></CheckLabel>
                                 </td>
                                 <td className="top">
                                     <div>
-                                        <ImgSpan
-                                            className={
-                                                item.ProductSubTag.amount === 0 ? 'soldout' : ''
-                                            }
-                                        >
-                                            <a href={`/detail?productId=${item.Product.id}`}>
+                                        <ImgSpan className={item.count === 0 ? 'soldout' : ''}>
+                                            <a href={`/detail?productId=${item.id}`}>
                                                 <img
-                                                    src={`https://musinsa-s3.s3.ap-northeast-2.amazonaws.com/image/${item.Product.ProductImg.src}`}
+                                                    src={
+                                                        productItem.img +
+                                                        getParametersForUnsplash({
+                                                            width: 80,
+                                                            height: 100,
+                                                            quality: 80,
+                                                            format: 'jpg',
+                                                        })
+                                                    }
                                                     alt="더미데이터"
                                                 />
                                             </a>
                                         </ImgSpan>
                                         <ItemUl>
                                             <li>
-                                                <a href={`/detail?productId=${item.Product.id}`}>
-                                                    {bigCategory[item.Product.BigCategoryId]} /{' '}
+                                                <a href={`/detail?productId=${productItem.id}`}>
+                                                    {bigCategory[productItem.bigCategoryId]} /{' '}
                                                     {
-                                                        smallCategory[item.Product.BigCategoryId][
-                                                            item.Product.SmallCategoryId
+                                                        smallCategory[productItem.bigCategoryId][
+                                                            productItem.smallCategoryId
                                                         ]
                                                     }
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href={`/detail?productId=${item.Product.id}`}>
-                                                    <strong>{item.Product.productTitle}</strong>
+                                                <a href={`/detail?productId=${productItem.id}`}>
+                                                    <strong>{productItem.productTitle}</strong>
                                                 </a>
                                             </li>
                                             <li>
-                                                {item.ProductSubTag.name} /{' '}
-                                                {item.ProductMainTag.name} /{' '}
-                                                {item.ProductSubTag.amount === 0
-                                                    ? `품절`
-                                                    : `${item.ProductSubTag.amount}개`}
+                                                {item.size} / {item.name} /&nbsp;
+                                                {item.amount === 0 ? `품절` : `${item.amount}개`}
                                             </li>
                                         </ItemUl>
                                     </div>
                                 </td>
-                                <td> {thousandComma(item.Product.productPrice)}원</td>
+                                <td> {thousandComma(productItem.price)}원</td>
                                 <td>
                                     <div className="input_amount">
                                         <button value={1} onClick={minusCount}>
@@ -189,15 +241,10 @@ function CartTable({ item, setCartList, cartList, cartRemove }) {
                                         </button>
                                     </div>
                                 </td>
-                                <td>{thousandComma(item.Product.productPrice * amountValue)}원</td>
+                                <td>{thousandComma(productItem.price * amountValue)}원</td>
                                 <td>
                                     택배배송 <br />
-                                    <strong>
-                                        {/* {item.Product.productPrice * amountValue > 30000
-                                            ? '배송비 무료'
-                                            : `${dlvChr}원`} */}
-                                        무료 배송
-                                    </strong>
+                                    <strong>무료 배송</strong>
                                 </td>
                                 <td>
                                     <div>
@@ -214,7 +261,7 @@ function CartTable({ item, setCartList, cartList, cartRemove }) {
                                                 setOrder={setOrder}
                                             />
                                         )}
-                                        <button className="del_btn" onClick={e => cartRemove(id)}>
+                                        <button className="del_btn" onClick={removeItem}>
                                             <FiX />
                                         </button>
                                     </div>
@@ -230,10 +277,7 @@ function CartTable({ item, setCartList, cartList, cartRemove }) {
                     show={modalOrder}
                     onCloseModal={onCloseModal}
                     onClickConfirm={onClickOrder}
-                    price={thousandComma(
-                        item.Product.productPrice * item.packingAmount,
-                        // (item.Product.productPrice * item.packingAmount > 30000 ? 0 : 3000),
-                    )}
+                    price={thousandComma(productItem.price * item.count)}
                     pay={pay}
                     setPay={setPay}
                 ></OrderModal>

@@ -398,7 +398,7 @@ const Signup = () => {
         const regExp = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,25}$/;
         if (regExp.test(e.target.value)) setPasswordReg(true);
         else setPasswordReg(false);
-    }, []);
+    }, [passwordConfirm]);
 
     const onChangePasswordConfirm = useCallback(
         e => {

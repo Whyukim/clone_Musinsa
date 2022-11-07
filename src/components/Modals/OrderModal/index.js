@@ -16,11 +16,9 @@ import { Address, Price, RadioContainer } from './style';
 const OrderModal = ({ show, onCloseModal, onClickConfirm, price, pay, setPay }) => {
     const detail = useProductDetailState();
     const dispatch = useProductDetailDispatch();
-
-    const data = getData();
-    const { accessToken } = data;
-
-    const [info, setInfo] = useState({});
+    const [loginData, setLoginData] = useState(() => {
+        return getData();
+    });
 
     const changeDispatch = useCallback((type, payload) => {
         return dispatch({ type, payload });
@@ -31,27 +29,6 @@ const OrderModal = ({ show, onCloseModal, onClickConfirm, price, pay, setPay }) 
         setPay(value);
         changeDispatch(ORDER, { pay: value });
     }, []);
-
-    useEffect(() => {
-        const asyncFunction = async () => {
-            try {
-                const data = {
-                    keys: ['address', 'recipientNumber', 'recipient', 'addressNumber'],
-                };
-                const result = await PostHeaderBodyApi(
-                    '/api/auth/getUserData',
-                    data,
-                    'Authorization',
-                    accessToken,
-                );
-
-                setInfo(result.data);
-            } catch (error) {}
-        };
-
-        asyncFunction();
-    }, []);
-    console.log(info);
 
     return (
         <Modal show={show} onCloseModal={onCloseModal}>
@@ -73,26 +50,26 @@ const OrderModal = ({ show, onCloseModal, onClickConfirm, price, pay, setPay }) 
                             <th className="modal" scope="row">
                                 수령인
                             </th>
-                            <td>{info.recipient ? info.recipient : '없음'}</td>
+                            <td>{loginData.info.name ? loginData.info.name : '없음'}</td>
                         </tr>
                         <tr>
                             <th className="modal" scope="row">
                                 휴대전화
                             </th>
-                            <td>{info.addressNumber ? info.addressNumber : '없음'}</td>
+                            <td>{loginData.info.mobile ? loginData.info.mobile : '없음'}</td>
                         </tr>
                         <tr>
                             <th className="modal" scope="row">
                                 전화번호
                             </th>
-                            <td>{info.recipientNumber ? info.recipientNumber : '없음'}</td>
+                            <td>{loginData.info.phone ? loginData.info.phone : '없음'}</td>
                         </tr>
                         <tr>
                             <th className="modal" scope="row">
                                 배송지 주소
                             </th>
                             <td className="address-input">
-                                {info.address ? info.address : '없음'}
+                                {loginData.info.address ? loginData.info.address : '없음'}
                             </td>
                         </tr>
                     </tbody>

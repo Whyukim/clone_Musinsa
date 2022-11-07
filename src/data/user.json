@@ -2,6 +2,51 @@
     {
         "id": 1,
         "userId": "test",
-        "userPw": "test"
+        "userPw": "test",
+        "info": {
+            "name": "홍길동",
+            "phone": "02-1234-5678",
+            "mobile": "010-1234-5678",
+            "address": "(12345) 인천광역시 서구"
+        },
+        "likes": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        "baskets": [
+            {
+                "id": 0,
+                "productId": "63688caecbd48baaa06effa9",
+                "count": 1,
+                "size": "S",
+                "name": "블랙",
+                "amount": 2,
+                "check": true
+            },
+            {
+                "id": 0,
+                "productId": "63688caef20e2264c9a08f65",
+                "count": 1,
+                "size": "S",
+                "name": "코발트 블루",
+                "amount": 5,
+                "check": true
+            },
+            {
+                "id": 0,
+                "productId": "63688caefb82cb8d1ac7f332",
+                "count": 4,
+                "size": "M",
+                "name": "녹색",
+                "amount": 9,
+                "check": true
+            },
+            {
+                "id": 0,
+                "productId": "63688caecdce90f25554b992",
+                "count": 0,
+                "size": "M",
+                "name": "레드",
+                "amount": 0,
+                "check": true
+            }
+        ]
     }
 ]
