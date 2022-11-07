@@ -112,14 +112,8 @@ const Header = props => {
     };
 
     const deleteLogout = useCallback(() => {
-        PostHeaderApi('/api/auth/logout', 'Authorization', login.accessToken)
-            .then(() => {
-                deleteData();
-                setLogin(false);
-            })
-            .catch(err => {
-                console.log(err);
-            });
+        deleteData();
+        setLogin(false);
     }, [login]);
 
     const goMain = () => {
@@ -230,12 +224,13 @@ const Header = props => {
 
                     <HUser>
                         {login ? (
-                            <button className="nowLogin">{login.userData.loginId}</button>
+                            <button className="nowLogin">{login.userId}</button>
                         ) : (
                             <Link to="/login">
                                 <button className="notLogin">로그인</button>
                             </Link>
                         )}
+
                         {login ? (
                             <div>
                                 <div className="flex" onClick={onClickNotice}>
