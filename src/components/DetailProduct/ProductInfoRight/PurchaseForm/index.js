@@ -89,23 +89,22 @@ const PurchaseForm = () => {
     }, [optionData]);
 
     // 좋아요 표시
-    const userLikes = useCallback(async () => {
-        const token = user.accessToken;
-        try {
-            const result = await GetTokenApi('/api/mypage/favoriteGoods', token);
-            let likeProduct = result.data.likeProduct.filter(v => `${v.id}` === query.productId);
-            setClickedlike(Object.keys(likeProduct).length > 0 ? true : false);
-        } catch (error) {
-            console.log(error);
-        }
-    }, []);
+    // const userLikes = useCallback(async () => {
+    //     const token = user.accessToken;
+    //     try {
+    //         const result = await GetTokenApi('/api/mypage/favoriteGoods', token);
+    //         let likeProduct = result.data.likeProduct.filter(v => `${v.id}` === query.productId);
+    //         setClickedlike(Object.keys(likeProduct).length > 0 ? true : false);
+    //     } catch (error) {
+    //         console.log(error);
+    //     }
+    // }, []);
 
     // 첫화면 초기화
     useEffect(() => {
         const asyncFunction = async () => {
             await optionDataStructureChange();
             await optionListInit();
-            if (user) await userLikes();
         };
 
         asyncFunction();
@@ -257,29 +256,34 @@ const PurchaseForm = () => {
             Cookies.set('redirect', pathname + search);
             navigate(`/login`);
         }
+        const itemArr = selectArr.map(v => v[1]);
+        const basket = loginToken.baskets.map(v => v.productId);
+        const arrBox = [];
+        itemArr.map((v, idx) => {
+            if (!basket.includes(v)) {
+                let item = selectArr[idx];
+                let itemSplit = item[4].replace('개남음)', '').split('(');
+                let name = itemSplit[0];
+                let amount = itemSplit[1];
 
-        // const addCarts = [];
-        // for (let list of selectArr) {
-        //     const obj = {
-        //         productId: query.productId,
-        //         mainTagId: Number(list[0]),
-        //         subTagId: Number(list[1]),
-        //         packingAmount: list[2],
-        //     };
-        //     addCarts.push(obj);
-        // }
+                const obj = {
+                    id: 0,
+                    productId: item[1],
+                    count: item[2],
+                    size: item[3],
+                    name,
+                    amount,
+                    check: true,
+                };
+                return arrBox.push(obj);
+            }
+        });
 
-        // const token = user.accessToken;
-        // try {
-        //     const params = {
-        //         addCarts,
-        //     };
-        //     await PostHeaderBodyApi('/api/product/addCart', params, 'Authorization', token);
-        //     setModalBasket(true);
-        // } catch (error) {
-        //     alert('이미 추가된 카테고리입니다');
-        //     console.error(error);
-        // }
+        let data = loginToken;
+        data.baskets = [...data.baskets, ...arrBox];
+        setData(data);
+
+        setModalBasket(true);
     }, [selectArr]);
 
     const onCloseModal = useCallback(() => {
