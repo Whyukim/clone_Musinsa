@@ -38,7 +38,8 @@ function CartTable({ item, setCartList, cartList, cartRemove }) {
             } else if (value == 0) {
                 alert('수량을 줄일 수 없습니다.');
             } else {
-                const temp = loginData.baskets.map(v => {
+                let data = getData();
+                const temp = data.baskets.map(v => {
                     if (v.productId === item.productId)
                         return {
                             ...v,
@@ -48,7 +49,6 @@ function CartTable({ item, setCartList, cartList, cartRemove }) {
                 });
                 setCartList(temp);
 
-                let data = loginData;
                 data.baskets = temp;
                 setData(data);
             }
@@ -61,28 +61,30 @@ function CartTable({ item, setCartList, cartList, cartRemove }) {
         if (amountValue >= item.amount) {
             alert('상품의 재고보다 많은 수량을 선택할 수 없습니다');
         } else {
-            const temp = loginData.baskets.map(v => {
-                if (v.productId === item.productId)
+            let data = getData();
+            const temp = data.baskets.map(v => {
+                if (v.productId === item.productId) {
+                    console.log(v);
                     return {
                         ...v,
                         count: amountValue + 1,
                     };
-                else return v;
+                } else return v;
             });
             setCartList(temp);
 
-            let data = loginData;
             data.baskets = temp;
             setData(data);
         }
-    }, [cartList]);
+    }, [loginData, amountValue]);
 
     // 수량 감소
     const minusCount = useCallback(() => {
         if (amountValue === 1) {
             alert('수량을 줄일 수 없습니다.');
         } else {
-            const temp = loginData.baskets.map(v => {
+            let data = getData();
+            const temp = data.baskets.map(v => {
                 if (v.productId === item.productId)
                     return {
                         ...v,
@@ -92,11 +94,10 @@ function CartTable({ item, setCartList, cartList, cartRemove }) {
             });
             setCartList(temp);
 
-            let data = loginData;
             data.baskets = temp;
             setData(data);
         }
-    }, [cartList]);
+    }, [loginData, amountValue]);
 
     // 체크
     const checkItem = useCallback(() => {
