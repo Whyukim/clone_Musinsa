@@ -30,13 +30,18 @@ import { useMemo } from 'react';
 import useSWR from 'swr';
 import fetcher from 'utils/fetcher';
 import { setData } from 'utils/setData';
+import { BOSKET, useGlobalDispatch, useGlobalState } from 'context/GlobalContext';
 
 const PurchaseForm = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const query = URLquery(location);
+
     const detail = useProductDetailState();
     const dispatch = useProductDetailDispatch();
+    const basketState = useGlobalState();
+    const basketDispatch = useGlobalDispatch();
+
     const user = getData();
     const [loginToken, setLoginToken] = useState(() => {
         return getData();
@@ -282,6 +287,11 @@ const PurchaseForm = () => {
         let data = loginToken;
         data.baskets = [...data.baskets, ...arrBox];
         setData(data);
+
+        const payload = {
+            basketCount: basketState.basketCount + arrBox.length,
+        };
+        basketDispatch({ type: BOSKET, payload });
 
         setModalBasket(true);
     }, [selectArr]);

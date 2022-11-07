@@ -26,6 +26,7 @@ import { useMainState, useMainDispatch, SEARCH, INIT } from 'context/MainContext
 import { ALL, TITLE } from 'context/MainContext';
 import NoticeList from 'components/NoticeList';
 import { useMemo } from 'react';
+import { useGlobalDispatch, useGlobalState } from 'context/GlobalContext';
 
 const Header = props => {
     const token = getData()?.accessToken;
@@ -43,16 +44,17 @@ const Header = props => {
     const navigate = useNavigate();
     const dispatch = useMainDispatch();
 
+    const basketState = useGlobalState();
+    const basketDispatch = useGlobalDispatch();
+
     //알림 추가, 더미데이터
     const [noticeList, setNoticeList] = useState([]);
+    const [shoppingNumber, setShoppingNumber] = useState(login ? login?.baskets.length : 0);
 
-    const { data: shoppingNumber, mutate } = useSWR(
-        token ? '/api/shoppingBasket/shoppingList' : null,
-        url => fetcher(url, token),
-        {
-            refreshInterval: 0,
-        },
-    );
+    useEffect(() => {
+        let basketsData = getData();
+        if (basketsData) setShoppingNumber(basketsData?.baskets.length);
+    }, [basketState]);
 
     const { data: noticeNumber, mutate: noticeMutate } = useSWR(
         token ? '/api/order/orderList' : null,
@@ -289,8 +291,7 @@ const Header = props => {
                         </div>
                         <div>
                             <Link to="/mypage/cart" className="basket">
-                                장바구니{' '}
-                                <CountNum>{shoppingNumber ? shoppingNumber.length : 0}</CountNum>
+                                장바구니 <CountNum>{shoppingNumber ? shoppingNumber : 0}</CountNum>
                             </Link>
                         </div>
                         <div>

@@ -22,6 +22,7 @@ import Kakao from 'pages/Kakao';
 import { URLquery } from 'utils/URLquery';
 import Cookies from 'js-cookie';
 import userData from 'data/user.json';
+import { BOSKET, useGlobalDispatch, useGlobalState } from 'context/GlobalContext';
 
 const LogIn = () => {
     const REST_API_KEY = process.env.REACT_APP_KAKAO_REST_API;
@@ -30,6 +31,9 @@ const LogIn = () => {
 
     const navigate = useNavigate();
     const location = useLocation();
+
+    const basketState = useGlobalState();
+    const basketDispatch = useGlobalDispatch();
 
     const [login, setLogin] = useState(getData());
 
@@ -78,6 +82,11 @@ const LogIn = () => {
                     sessionStorage.setItem('data', JSON.stringify(...login));
                     localStorage.removeItem('data');
                 }
+
+                const payload = {
+                    basketCount: login[0].baskets.length,
+                };
+                basketDispatch({ type: BOSKET, payload });
 
                 Cookies.set('autoLogin', autoLoginCheck);
                 setLogin(true);

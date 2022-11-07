@@ -2,10 +2,11 @@ import React, { useReducer, createContext, useContext } from 'react';
 
 const initialGlobal = {
     sideBar: false,
-    autoLogin: false,
+    basketCount: 0,
 };
 
 export const SIDEBAR = 'SIDEBAR';
+export const BOSKET = 'BOSKET';
 
 function GlobalReducer(state, action) {
     switch (action.type) {
@@ -13,6 +14,13 @@ function GlobalReducer(state, action) {
             return {
                 ...state,
                 sideBar: action.payload.sideBar,
+            };
+
+        case BOSKET:
+            console.log(state);
+            return {
+                ...state,
+                basketCount: action.payload.basketCount,
             };
 
         default:

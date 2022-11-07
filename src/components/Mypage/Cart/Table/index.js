@@ -12,8 +12,12 @@ import Order from 'components/Order';
 import itemData from 'data/main.json';
 import { getData } from 'utils/getData';
 import { setData } from 'utils/setData';
+import { BOSKET, useGlobalDispatch, useGlobalState } from 'context/GlobalContext';
 
 function CartTable({ item, setCartList, cartList, cartRemove }) {
+    const basketState = useGlobalState();
+    const basketDispatch = useGlobalDispatch();
+
     const [modalOrder, setModalOrder] = useState(false);
     const [pay, setPay] = useState('card');
     const [order, setOrder] = useState(false);
@@ -115,6 +119,11 @@ function CartTable({ item, setCartList, cartList, cartRemove }) {
         let data = loginData;
         data.baskets = temp;
         setData(data);
+
+        const payload = {
+            basketCount: basketState.basketCount - 1,
+        };
+        basketDispatch({ type: BOSKET, payload });
     }, [cartList]);
 
     // 결제 모달창
