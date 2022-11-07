@@ -103,10 +103,10 @@ export const MiddleCategory = styled.div`
             display: inline-block;
             // max-width: 800px;
 
-            li:first-of-type {
+            /* li:first-of-type {
                 color: black;
                 font-weight: bold;
-            }
+            } */
 
             .inactive {
                 float: left;

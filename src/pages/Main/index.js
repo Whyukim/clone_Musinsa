@@ -27,7 +27,7 @@ import DialLog from 'layouts/DialLog';
 import Pagination from 'react-js-pagination';
 import { URLquery } from 'utils/URLquery';
 import { Oval } from 'react-loader-spinner';
-import { useMainState, useMainDispatch, ALL } from 'context/MainContext';
+import { useMainState, useMainDispatch, ALL, SEARCH } from 'context/MainContext';
 import { CATEGORY, MAINSORT, PRICE, TITLE, ALLTITLE } from 'context/MainContext';
 import itemData from 'data/main.json';
 import useInput from 'hooks/useInput';
@@ -87,6 +87,67 @@ const Main = () => {
     //MainSort 배열
     const mainSortArr = ['낮은 가격순', '높은 가격순', '후기순'];
 
+    useEffect(() => {
+        let data = itemData;
+        // 중분류
+        if (state.smallCategoryId === 0) {
+            data = data.filter(v => (v.bigCategoryId === state.bigCategoryId ? true : false));
+        } else {
+            data = data.filter(v =>
+                v.smallCategoryId === state.smallCategoryId &&
+                v.bigCategoryId === state.bigCategoryId
+                    ? true
+                    : false,
+            );
+        }
+
+        // 가격 분류
+        if (state.price) {
+            let mi = Number(
+                priceArr[state.price - 1]
+                    .replaceAll('원', '')
+                    .replaceAll(',', '')
+                    .trim()
+                    .split('~')[0],
+            );
+            let ma = Number(
+                priceArr[state.price - 1]
+                    .replaceAll('원', '')
+                    .replaceAll(',', '')
+                    .trim()
+                    .split('~')[1],
+            );
+
+            if (state.price === 5) ma = 10000;
+
+            data = data.filter(v => (v.price > mi && v.price <= ma ? true : false));
+        }
+
+        // 검색
+        if (state.search && state.search.trim()) {
+            data = data.filter(v => v.productTitle.includes(state.search));
+        }
+
+        // 정렬
+        if (state.mainSort) {
+            data = data.sort((a, b) => {
+                if (state.mainSort === 1) {
+                    if (a.price < b.price) return -1;
+                    return 1;
+                } else if (state.mainSort === 2) {
+                    if (a.price > b.price) return -1;
+                    return 1;
+                } else {
+                    if (a.comment > b.comment) return -1;
+                    return 1;
+                }
+            });
+        }
+        console.log(data);
+
+        setProduct(data);
+    }, [state, min, max]);
+
     //Price 삭제 함수(가격 - 전체보기)
     const onResetPrice = useCallback(() => {
         const payload = {
@@ -95,26 +156,7 @@ const Main = () => {
             priceMax: 0,
         };
         dispatch({ type: PRICE, payload });
-
-        // const newArr = clickPrice;
-        // if (newArr.includes(true)) {
-        //     newArr[clickPrice.indexOf(true)] = false;
-        // }
-        // setClickPrice(newArr);
-        if (!category.current) {
-            const data = itemData.filter(v =>
-                v.bigCategoryId === state.bigCategoryId ? true : false,
-            );
-            setProduct(data);
-        } else {
-            const data = itemData.filter(v =>
-                v.smallCategoryId === category.current && v.bigCategoryId === state.bigCategoryId
-                    ? true
-                    : false,
-            );
-            setProduct(data);
-        }
-    }, [max, min, state, priceState, category]);
+    }, []);
 
     //priceMin, Max 삭제함수
     const onResetPriceRange = useCallback(() => {
@@ -199,10 +241,6 @@ const Main = () => {
     // };
 
     // useEffect(() => {
-    //     console.log(state);
-    // }, [state]);
-
-    // useEffect(() => {
     //     const result = makeQS();
 
     //     if (result == '?') {
@@ -236,37 +274,18 @@ const Main = () => {
     const onSort = useCallback(
         val => {
             if (val > 0) {
-                category.current = val;
                 const payload = {
                     bigCategoryId: state.bigCategoryId,
                     smallCategoryId: val,
                 };
                 dispatch({ type: CATEGORY, payload });
-
-                if (!state.price) {
-                    const data = itemData.filter(v =>
-                        v.smallCategoryId === val && v.bigCategoryId === state.bigCategoryId
-                            ? true
-                            : false,
-                    );
-                    setProduct(data);
-                } else {
-                    const data = itemData.filter(v =>
-                        v.smallCategoryId === val &&
-                        v.bigCategoryId === state.bigCategoryId &&
-                        v.price > min.current &&
-                        v.price <= max.current
-                            ? true
-                            : false,
-                    );
-                    setProduct(data);
-                }
             } else {
                 onReset(val);
             }
         },
-        [min, max, state],
+        [state],
     );
+    console.log(state);
 
     //smallCateId 삭제 함수(중분류 - 전체)
     const onReset = useCallback(() => {
@@ -275,20 +294,7 @@ const Main = () => {
             smallCategoryId: 0,
         };
         dispatch({ type: CATEGORY, payload });
-
-        if (!state.price) {
-            const data = itemData.filter(v =>
-                v.bigCategoryId === state.bigCategoryId ? true : false,
-            );
-            setProduct(data);
-        } else {
-            const data = itemData.filter(v =>
-                v.price > min.current && v.price <= max.current ? true : false,
-            );
-            setProduct(data);
-        }
-        category.current = 0;
-    }, [min, max, state]);
+    }, [state]);
 
     //price추가
     const onFilterPrice = useCallback(
@@ -303,39 +309,36 @@ const Main = () => {
             dispatch({ type: PRICE, payload });
 
             setPriceState(val);
-            clickBoldPrice(val);
+            // clickBoldPrice(val);
         },
         [state],
     );
 
     const clickBoldPrice = useCallback(
         val => {
-            min.current = Number(
-                priceArr[val - 1].replaceAll('원', '').replaceAll(',', '').trim().split('~')[0],
-            );
-            max.current = Number(
-                priceArr[val - 1].replaceAll('원', '').replaceAll(',', '').trim().split('~')[1],
-            );
-
-            if (min.current && !max.current) max.current = 10000;
-
-            if (!category.current) {
-                const data = itemData.filter(v =>
-                    v.price > min.current && v.price <= max.current ? true : false,
-                );
-                setProduct(data);
-            } else {
-                const data = itemData.filter(v =>
-                    v.smallCategoryId === category.current &&
-                    v.bigCategoryId === state.bigCategoryId &&
-                    v.price > min.current &&
-                    v.price <= max.current
-                        ? true
-                        : false,
-                );
-
-                setProduct(data);
-            }
+            // min.current = Number(
+            //     priceArr[val - 1].replaceAll('원', '').replaceAll(',', '').trim().split('~')[0],
+            // );
+            // max.current = Number(
+            //     priceArr[val - 1].replaceAll('원', '').replaceAll(',', '').trim().split('~')[1],
+            // );
+            // if (min.current && !max.current) max.current = 10000;
+            // if (!category.current) {
+            //     const data = itemData.filter(v =>
+            //         v.price > min.current && v.price <= max.current ? true : false,
+            //     );
+            //     setProduct(data);
+            // } else {
+            //     const data = itemData.filter(v =>
+            //         v.smallCategoryId === category.current &&
+            //         v.bigCategoryId === state.bigCategoryId &&
+            //         v.price > min.current &&
+            //         v.price <= max.current
+            //             ? true
+            //             : false,
+            //     );
+            //     setProduct(data);
+            // }
         },
         [state, priceState, category],
     );
@@ -363,20 +366,6 @@ const Main = () => {
             mainSort: val,
         };
         dispatch({ type: MAINSORT, payload });
-
-        const data = itemData.sort((a, b) => {
-            if (val === 1) {
-                if (a.price < b.price) return -1;
-                return 1;
-            } else if (val === 2) {
-                if (a.price > b.price) return -1;
-                return 1;
-            } else {
-                if (a.comment > b.comment) return -1;
-                return 1;
-            }
-        });
-        setProduct(data);
     };
 
     // //검색창 input들 state
@@ -388,22 +377,12 @@ const Main = () => {
     const [maxPriceInput, onChangeMaxPriceInput, setMaxPriceInput] = useInput(0);
 
     // //검색창 select박스 reset
-    // const onResetSearch = () => {
-    //     setSearch(false);
-
-    //     //payload = { productTitle : ''}은 적용이 안됨
-    //     const payload = {
-    //         bigCategoryId: state.bigCategoryId,
-    //         smallCategoryId: state.smallCategoryId,
-    //         mainSort: state.mainSort,
-    //         price: state.price,
-    //         priceMin: state.priceMin,
-    //         priceMax: state.priceMax,
-    //         productTitle: '',
-    //     };
-    //     dispatch({ type: ALL, payload });
-    //     setSearchTerm('');
-    // };
+    const onResetSearch = () => {
+        const payload = {
+            search: '',
+        };
+        dispatch({ type: SEARCH, payload });
+    };
 
     // //페이지네이션 관련
     const [page, setPage] = useState(1);
@@ -493,7 +472,11 @@ const Main = () => {
                                         })
                                         .map((data, idx) => (
                                             <li
-                                                className={clickCate[idx] ? 'active' : 'inactive'}
+                                                className={
+                                                    state.smallCategoryId === idx
+                                                        ? 'active'
+                                                        : 'inactive'
+                                                }
                                                 onClick={() => onSort(idx)}
                                                 key={idx}
                                             >
@@ -586,17 +569,15 @@ const Main = () => {
                                 </span>
                                 <span className="select-medium-button">&#160;X</span>
                             </div>
-                            {/* <div
-                                className={search ? 'visible' : 'invisible'}
-                                // onClick={() => {
-                                //     onResetSearch();
-                                // }}
+                            <div
+                                className={state.search ? 'visible' : 'invisible'}
+                                onClick={() => {
+                                    onResetSearch();
+                                }}
                             >
-                                <span className="select-medium">
-                                    검색: {searchTerm || state.productTitle}
-                                </span>
+                                <span className="select-medium">검색: {state.search}</span>
                                 <span className="select-medium-button">&#160;X</span>
-                            </div> */}
+                            </div>
                             <div
                                 className={state.mainSort ? 'visible' : 'invisible'}
                                 onClick={() => {

@@ -22,7 +22,7 @@ import { AiOutlineSearch } from '@react-icons/all-files/ai/AiOutlineSearch';
 import { IoMdArrowDropup } from '@react-icons/all-files/io/IoMdArrowDropup';
 import { FaCommentsDollar } from 'react-icons/fa';
 
-import { useMainState, useMainDispatch } from 'context/MainContext';
+import { useMainState, useMainDispatch, SEARCH } from 'context/MainContext';
 import { ALL, TITLE } from 'context/MainContext';
 import NoticeList from 'components/NoticeList';
 import { useMemo } from 'react';
@@ -74,32 +74,15 @@ const Header = props => {
                 localStorage.setItem('keywords', JSON.stringify(value));
             }
 
-            props.setSearch(true);
             const payload = {
-                productTitle: inputValue,
+                search: inputValue,
             };
-            dispatch({ type: TITLE, payload });
+            dispatch({ type: SEARCH, payload });
             setInputValue('');
+            setOpen(false);
         },
         [search, inputValue],
     );
-
-    const searchBtn = useCallback(() => {
-        const keyWord = localStorage.getItem('keywords');
-
-        if (!keyWord.includes(inputValue) || !inputValue === '') {
-            setSearch(prev => [...prev, inputValue]);
-            const value = [...search, inputValue];
-            localStorage.setItem('keywords', JSON.stringify(value));
-        }
-
-        props.setSearch(true);
-        const payload = {
-            productTitle: inputValue,
-        };
-        dispatch({ type: TITLE, payload });
-        setInputValue('');
-    }, [search, inputValue]);
 
     const onClickDeleteSearchAll = useCallback(() => {
         setSearch([]);
@@ -201,7 +184,7 @@ const Header = props => {
                                 <span>
                                     <AiOutlineCamera />
                                 </span>
-                                <span onClick={searchBtn}>
+                                <span onClick={formSub}>
                                     <AiOutlineSearch />
                                 </span>
                             </form>

@@ -14,14 +14,11 @@ const Sidebar = props => {
     const dispatch = useGlobalDispatch();
     const location = useLocation();
     const navigate = useNavigate();
-    // const [cancel, setCancel] = useState(true);
     const [cancel, setCancel] = useState(Cookies.get('sideBarToggle') === 'false' ? false : true);
     const [open, setOpen] = useState(Array.from({ length: bigCategory.length }, () => false));
 
     const state = useMainState();
     const dispatchMain = useMainDispatch();
-
-    //const [clickSideBar, setClickSideBar] = useState([]);
 
     useEffect(() => {
         const payload = {
@@ -32,10 +29,6 @@ const Sidebar = props => {
 
     //Main - filterVal 수정 등
     const sendSmallCate = (big, small) => {
-        // smallCate index가 0인 경우(전체) / 아닌경우
-        // smallCate index가 1이상인 경우에는 bigCateId가 이미 있는경우/없는경우
-        //이중 삼항연산자
-
         const newArr = props.clickSideBar;
         if (props.clickSideBar.includes(true)) {
             newArr[props.clickSideBar.indexOf(true)] = false;
@@ -70,14 +63,12 @@ const Sidebar = props => {
         } else {
             navigate('/');
             if (small === 0) {
-                //return navigate(`/?bigCategoryId=${big + 1}`);
                 const payload = {
                     bigCategoryId: big + 1,
                     smallCategoryId: 0,
                 };
                 dispatchMain({ type: CATEGORY, payload });
             } else {
-                //return navigate(`/?bigCategoryId=${big + 1}&smallCategoryId=${small}`);
                 const payload = {
                     bigCategoryId: big + 1,
                     smallCategoryId: small,
@@ -144,7 +135,7 @@ const Sidebar = props => {
                                         <span
                                             key={idex}
                                             className={
-                                                props.clickSideBar && props.clickSideBar[idex || 0]
+                                                state.smallCategoryId === idex
                                                     ? 'active'
                                                     : 'inactive'
                                             }
