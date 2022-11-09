@@ -26,7 +26,7 @@ import { useMainState, useMainDispatch, SEARCH, INIT } from 'context/MainContext
 import { ALL, TITLE } from 'context/MainContext';
 import NoticeList from 'components/NoticeList';
 import { useMemo } from 'react';
-import { useGlobalDispatch, useGlobalState } from 'context/GlobalContext';
+import { BOSKET, useGlobalDispatch, useGlobalState } from 'context/GlobalContext';
 import { getStorage } from 'utils/getStorage';
 import { setStorage } from 'utils/setStorage';
 
@@ -125,6 +125,12 @@ const Header = props => {
             }
         }
         setStorage('user', user);
+
+        const payload = {
+            basketCount: 0,
+        };
+        basketDispatch({ type: BOSKET, payload });
+
         deleteData();
         setLogin(false);
     }, [login]);
@@ -143,10 +149,11 @@ const Header = props => {
 
     const noticeDay = useMemo(() => {
         let value;
+        let temp = getStorage('user')[0];
 
-        if (!noticeNumber) return false;
-        else value = noticeNumber[noticeNumber.length - 1].createdAt.slice(0, 10).split('-');
-
+        if (temp?.order) {
+            value = temp.order[temp.order.length - 1].date;
+        }
         const today = new Date();
         const timeValue = new Date(value);
 

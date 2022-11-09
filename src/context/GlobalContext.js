@@ -17,7 +17,6 @@ function GlobalReducer(state, action) {
             };
 
         case BOSKET:
-            console.log(state);
             return {
                 ...state,
                 basketCount: action.payload.basketCount,
