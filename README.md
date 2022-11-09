@@ -101,30 +101,6 @@
 <br />
 <br />
 <br />
-    
-# 🎨 Skills
-### 🧶 Front
-* React
-* React Router
-* Styled Component
-* UseConText
-* USESWR
-
-### 🛠 Back
-* Node
-* JWT
-* Jenkins
-* Redis
-* S3
-* MySql
-* Express
-* Sequelize
-* 결제 API(IAMPORT)  
-
-<br />
-<br />
-<br />
-<br />
 
 # 👨‍👨‍👧‍👦 팀원 소개
 
@@ -135,15 +111,6 @@
 <a href="www.naver.com"><img width="180" height="180" src="https://user-images.githubusercontent.com/110218594/195768697-95dead67-fe4f-42a2-be59-218602e70506.png" alt="Material Bread logo"></a> | <a href="www.naver.com"><img width="180" height="180" src="https://user-images.githubusercontent.com/110218594/195768697-95dead67-fe4f-42a2-be59-218602e70506.png" alt="Material Bread logo"></a> | <a href="www.naver.com"><img width="180" height="180" src="https://user-images.githubusercontent.com/110218594/195768697-95dead67-fe4f-42a2-be59-218602e70506.png" alt="Material Bread logo"></a> | <a href="www.naver.com"><img width="180" height="180" src="https://user-images.githubusercontent.com/110218594/195768697-95dead67-fe4f-42a2-be59-218602e70506.png" alt="Material Bread logo"></a> 
 <a href="https://github.com/devchosil">GitHub</a> | <a href="https://github.com/joooo1028">GitHub</a> | <a href="www.naver.com">GitHub</a> | <a href="www.naver.com">GitHub</a> 
 FrontEnd | FrontEnd | FrontEnd | FrontEnd
- 
-</div>
-<div align="center">
-    
-이민서 | 이준영
-:---: | :---:
-<a href="www.naver.com"><img width="180" height="180" src="https://user-images.githubusercontent.com/110218594/195768697-95dead67-fe4f-42a2-be59-218602e70506.png" alt="Material Bread logo"></a> | <a href="www.naver.com"><img width="180" height="180" src="https://avatars.githubusercontent.com/u/7973448?s=400&u=800b64efe4bbb92dab15f37b3f34ae8e211d4989&v=4" alt="Material Bread logo"></a>
-<a href="https://github.com/nacho1415">GitHub</a> | <a href="https://github.com/2jun0">GitHub</a> 
-BackEnd(메인 개발) | BackEnd(서브 개발)
  
 </div>
 　
@@ -160,11 +127,4 @@ BackEnd(메인 개발) | BackEnd(서브 개발)
     * react-icons 대신 @react-icons/all-files를 활용한 아이콘 최적화
 * 아임포트를 이용한 test 결제 기능
 * 장바구니 기능 구현(삭제, 결제, 수량변경 등)
-
-
-### Backend
-* 휴대폰 인증, 이메일 인증, 소셜 로그인 등 인증 절차가 필요한 부분은 모두 토큰 도입
-* 2만 여개의 가데이터를 생성하여 실제 사이트처럼 제작
-*  Jenkins를 사용하여 CI/CD 구축 
-*  Vultr을 사용한 서버 배포
 
