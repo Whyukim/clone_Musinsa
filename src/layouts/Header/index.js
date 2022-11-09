@@ -38,11 +38,6 @@ const Header = props => {
     const [open, setOpen] = useState(false);
     const [notice, setNotice] = useState(false);
 
-    const [modalFirst, setModalFirst] = useState(true);
-    const onCloseModal = useCallback(() => {
-        setModalFirst(false);
-    }, []);
-
     const navigate = useNavigate();
     const dispatch = useMainDispatch();
 
@@ -119,12 +114,14 @@ const Header = props => {
         let user = getStorage('user');
         let data = getStorage('data');
 
-        for (let i = 0; i < user.length; i++) {
-            if (user[i].id === data.id) {
-                user[i] = data;
+        if (user || data) {
+            for (let i = 0; i < user.length; i++) {
+                if (user[i].id === data.id) {
+                    user[i] = data;
+                }
             }
+            setStorage('user', user);
         }
-        setStorage('user', user);
 
         const payload = {
             basketCount: 0,
@@ -168,6 +165,8 @@ const Header = props => {
                 return true;
             }
         }
+
+        return false;
     }, [noticeNumber]);
 
     return (
