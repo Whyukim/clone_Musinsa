@@ -134,6 +134,7 @@ const Header = props => {
         setShoppingNumber(0);
         deleteData();
         setLogin(false);
+        navigate('/');
     }, [login]);
 
     const goMain = () => {
