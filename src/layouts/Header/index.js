@@ -131,6 +131,7 @@ const Header = props => {
         };
         basketDispatch({ type: BOSKET, payload });
 
+        setShoppingNumber(0);
         deleteData();
         setLogin(false);
     }, [login]);
