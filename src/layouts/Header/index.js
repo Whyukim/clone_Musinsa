@@ -149,9 +149,10 @@ const Header = props => {
 
     const noticeDay = useMemo(() => {
         let value;
-        let temp = getStorage('user') || getStorage('user')[0] || null;
+        let temp = getStorage('user') || null;
 
         if (temp) {
+            temp = temp[0];
             if (temp?.order) {
                 value = temp.order[temp.order.length - 1].date;
             }
