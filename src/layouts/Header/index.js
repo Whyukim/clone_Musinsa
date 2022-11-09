@@ -149,19 +149,21 @@ const Header = props => {
 
     const noticeDay = useMemo(() => {
         let value;
-        let temp = getStorage('user')[0];
+        let temp = getStorage('user') || getStorage('user')[0] || null;
 
-        if (temp?.order) {
-            value = temp.order[temp.order.length - 1].date;
-        }
-        const today = new Date();
-        const timeValue = new Date(value);
+        if (temp) {
+            if (temp?.order) {
+                value = temp.order[temp.order.length - 1].date;
+            }
+            const today = new Date();
+            const timeValue = new Date(value);
 
-        const betweenTime = Math.floor((today.getTime() - timeValue.getTime()) / 1000 / 60);
+            const betweenTime = Math.floor((today.getTime() - timeValue.getTime()) / 1000 / 60);
 
-        const betweenTimeHour = Math.floor(betweenTime / 60);
-        if (betweenTimeHour < 24) {
-            return true;
+            const betweenTimeHour = Math.floor(betweenTime / 60);
+            if (betweenTimeHour < 24) {
+                return true;
+            }
         }
     }, [noticeNumber]);
 
