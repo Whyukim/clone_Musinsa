@@ -23,6 +23,8 @@ import { URLquery } from 'utils/URLquery';
 import Cookies from 'js-cookie';
 import userData from 'data/user.json';
 import { BOSKET, useGlobalDispatch, useGlobalState } from 'context/GlobalContext';
+import { setStorage } from 'utils/setStorage';
+import { getStorage } from 'utils/getStorage';
 
 const LogIn = () => {
     const REST_API_KEY = process.env.REACT_APP_KAKAO_REST_API;
@@ -30,7 +32,6 @@ const LogIn = () => {
     const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`;
 
     const navigate = useNavigate();
-    const location = useLocation();
 
     const basketState = useGlobalState();
     const basketDispatch = useGlobalDispatch();
@@ -48,6 +49,11 @@ const LogIn = () => {
             : true,
     );
     const [keyframesClass, setKeyframesClass] = useState('');
+
+    useEffect(() => {
+        let users = getStorage('user') || userData;
+        setStorage('user', users);
+    }, []);
 
     // auto Login Toggle button
     const toggleAutoLogin = useCallback(
@@ -69,12 +75,17 @@ const LogIn = () => {
             if (!email || !email.trim()) return alert('아이디를 입력해 주세요.');
             if (!password || !password.trim()) return alert('비밀번호를 입력해 주세요.');
 
-            let login = userData.map(v => {
-                if (v.userId === email && v.userPw === password) return v;
-                else return false;
-            });
+            let users = getStorage('user') || userData;
 
-            if (login) {
+            let login = [];
+            for (let i = 0; i < users.length; i++) {
+                if (users[i].userId === email && users[i].userPw === password) {
+                    login = [users[i]];
+                    break;
+                }
+            }
+
+            if (login.length) {
                 if (autoLoginCheck) {
                     localStorage.setItem('data', JSON.stringify(...login));
                     sessionStorage.removeItem('data');
@@ -104,6 +115,39 @@ const LogIn = () => {
         },
         [email, password, autoLoginCheck],
     );
+
+    const onClickTest = useCallback(() => {
+        let users = getStorage('user') || userData;
+        let login = users.filter(v => v.userId === 'test');
+
+        if (login) {
+            if (autoLoginCheck) {
+                localStorage.setItem('data', JSON.stringify(...login));
+                sessionStorage.removeItem('data');
+            } else {
+                sessionStorage.setItem('data', JSON.stringify(...login));
+                localStorage.removeItem('data');
+            }
+
+            const payload = {
+                basketCount: login[0].baskets.length,
+            };
+            basketDispatch({ type: BOSKET, payload });
+
+            Cookies.set('autoLogin', autoLoginCheck);
+            setLogin(true);
+
+            const redirect = Cookies.get('redirect');
+            if (redirect) {
+                navigate(redirect);
+                return Cookies.remove('redirect');
+            }
+
+            return navigate('/');
+        } else {
+            alert('로그인에 실패하였습니다.');
+        }
+    }, []);
 
     const kakaoLoginButton = useCallback(() => {
         Cookies.set('autoLogin', autoLoginCheck);
@@ -140,6 +184,13 @@ const LogIn = () => {
                             validation={false}
                         ></UserPassword>
                         <LoginButton>
+                            <button
+                                type="button"
+                                onClick={onClickTest}
+                                className="login-button__item"
+                            >
+                                TEST 아이디로 로그인
+                            </button>
                             <button type="submit" className="login-button__item">
                                 로그인
                             </button>

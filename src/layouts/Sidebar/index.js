@@ -5,7 +5,7 @@ import { bigCategory, alpabet } from 'utils/bigCategory';
 import { smallCategory } from 'utils/smallCategory';
 import Cookies from 'js-cookie';
 import { SIDEBAR, useGlobalDispatch } from 'context/GlobalContext';
-import { useMainState, useMainDispatch } from 'context/MainContext';
+import { useMainState, useMainDispatch, PAGE } from 'context/MainContext';
 import { CATEGORY } from 'context/MainContext';
 import { AiOutlinePlus } from '@react-icons/all-files/ai/AiOutlinePlus';
 import { AiOutlineMinus } from '@react-icons/all-files/ai/AiOutlineMinus';
@@ -53,6 +53,11 @@ const Sidebar = props => {
                     dispatchMain({ type: CATEGORY, payload });
                 }
             }
+
+            let payload = {
+                page: 1,
+            };
+            dispatchMain({ type: PAGE, payload });
         } else {
             navigate('/');
             if (small === 0) {

@@ -27,7 +27,7 @@ import DialLog from 'layouts/DialLog';
 import Pagination from 'react-js-pagination';
 import { URLquery } from 'utils/URLquery';
 import { Oval } from 'react-loader-spinner';
-import { useMainState, useMainDispatch, ALL, SEARCH } from 'context/MainContext';
+import { useMainState, useMainDispatch, ALL, SEARCH, PAGE } from 'context/MainContext';
 import { CATEGORY, MAINSORT, PRICE, TITLE, ALLTITLE } from 'context/MainContext';
 import itemData from 'data/main.json';
 import useInput from 'hooks/useInput';
@@ -71,10 +71,6 @@ const Main = () => {
     const max = useRef(0);
     const category = useRef(0);
 
-    //쿼리스트링 활용
-    const location = useLocation();
-    const query = URLquery(location);
-
     //가격 배열
     const priceArr = [
         '~ 100원',
@@ -90,9 +86,13 @@ const Main = () => {
     useEffect(() => {
         let data = itemData;
         // 중분류
-        if (state.smallCategoryId === 0) {
+        if (state.bigCategoryId === 0) {
+            console.log(1);
+        } else if (state.bigCategoryId !== 0 && state.smallCategoryId === 0) {
+            console.log(2);
             data = data.filter(v => (v.bigCategoryId === state.bigCategoryId ? true : false));
-        } else {
+        } else if (state.bigCategoryId !== 0 && state.smallCategoryId !== 0) {
+            console.log(3);
             data = data.filter(v =>
                 v.smallCategoryId === state.smallCategoryId &&
                 v.bigCategoryId === state.bigCategoryId
@@ -143,7 +143,6 @@ const Main = () => {
                 }
             });
         }
-        console.log(data);
 
         setProduct(data);
     }, [state, min, max]);
@@ -158,19 +157,6 @@ const Main = () => {
         dispatch({ type: PRICE, payload });
     }, []);
 
-    //priceMin, Max 삭제함수
-    const onResetPriceRange = useCallback(() => {
-        const payload = {
-            price: 0,
-            priceMin: 0,
-            priceMax: 0,
-        };
-        dispatch({ type: PRICE, payload });
-
-        setMinPriceInput('');
-        setMaxPriceInput('');
-    }, [min, max]);
-
     //mainSort 삭제함수
     const onResetMainSort = () => {
         const payload = {
@@ -180,10 +166,6 @@ const Main = () => {
 
         setClickMainSort(clickMainSort.fill(false));
     };
-
-    //클릭한 요소 style변경
-    //전체 요소수와 같은 배열 생성 - 모두  false로 채움 - 클릭한 요소만 true로 변경
-    //state 변했을때, clickCate가 바로 변하지 않음(smallCate 숫자가 안변함)
 
     const [clickCate, setClickCate] = useState([]);
     const [clickSideBar, setClickSideBar] = useState([]);
@@ -200,79 +182,25 @@ const Main = () => {
         }).fill(false),
     );
 
-    const makeQS = () => {
-        let result = '?';
-        let count = 0;
-        const titleKey = Object.keys(state)[6];
-        const titleValue = Object.values(state)[6];
-
-        for (let [key, value] of Object.entries(state)) {
-            if (value > 0) {
-                if (++count > 1) result += `&`;
-                result += `${key}=${value}`;
-            }
-        }
-        let finalResult = result;
-        if (state.productTitle !== '' && state.productTitle !== undefined) {
-            finalResult += `&${titleKey}=${titleValue}`;
-        }
-
-        return finalResult;
-    };
-
-    const clickBold = () => {
-        const newArr = clickCate;
-        if (newArr.includes(true)) newArr[clickCate.indexOf(true)] = false;
-
-        newArr[state.smallCategoryId] = true;
-        setClickCate(() => newArr);
-    };
-
-    // const clickBoldMainSort = () => {
-    // const newArr = clickMainSort;
-    // if (newArr.includes(true)) newArr[clickMainSort.indexOf(true)] = false;
-    // newArr[state.mainSort - 1] = true;
-    // else {
-    //     if (newArr.includes(true)) newArr[clickMainSort.indexOf(true)] = false;
-    // }
-    // if (newArr.includes(true)) newArr[clickMainSort.indexOf(true)] = false;
-    // newArr[state.mainSort && state.mainSort - 1] = true;
-    // setClickMainSort(newArr);
-    // };
-
-    // useEffect(() => {
-    //     const result = makeQS();
-
-    //     if (result == '?') {
-    //         // PostQueryApi(`/api/product/productList`).then(res => setProduct(res.data.productData));
-    //         // setProduct(itemData)
-    //         navigate('/');
-    //     } else {
-    //         PostQueryApi(`/api/product/productList${result}`).then(res =>
-    //             setProduct(res.data.productData),
-    //         );
-    //         navigate(`${result}`);
-    //     }
-
-    //     clickBold();
-    //     clickBoldPrice();
-    //     clickBoldMainSort();
-    // }, [state]);
-
-    // useEffect(() => {
-    //     setMinPriceInput('');
-    //     setMaxPriceInput('');
-    //     setPage(1);
-    // }, [state.bigCategoryId]);
-
-    // useEffect(() => {
-    //     setPage(1);
-    // }, [state.smallCategoryId]);
-
-    //handleFilter함수 사용해서 쿼리문 추가
     //smallCategoryId추가(중분류)
-    const onSort = useCallback(
+    const onSortBig = useCallback(
         val => {
+            let payload = {
+                bigCategoryId: val,
+                smallCategoryId: 0,
+            };
+            dispatch({ type: CATEGORY, payload });
+
+            payload = {
+                page: 1,
+            };
+            dispatch({ type: PAGE, payload });
+        },
+        [state],
+    );
+
+    const onSort = useCallback(
+        (val, big) => {
             if (val > 0) {
                 const payload = {
                     bigCategoryId: state.bigCategoryId,
@@ -282,10 +210,14 @@ const Main = () => {
             } else {
                 onReset(val);
             }
+
+            let payload = {
+                page: 1,
+            };
+            dispatch({ type: PAGE, payload });
         },
         [state],
     );
-    console.log(state);
 
     //smallCateId 삭제 함수(중분류 - 전체)
     const onReset = useCallback(() => {
@@ -385,10 +317,14 @@ const Main = () => {
     };
 
     // //페이지네이션 관련
-    const [page, setPage] = useState(1);
+    // const [page, setPage] = useState(1);
     const [items, setItems] = useState(75);
     const handlePageChange = page => {
-        setPage(page); //페이지바뀔때마다
+        let payload = {
+            page,
+        };
+        dispatch({ type: PAGE, payload });
+        // setPage(page); //페이지바뀔때마다
     };
 
     const length = product.length;
@@ -420,7 +356,7 @@ const Main = () => {
                             >
                                 {state.bigCategoryId
                                     ? bigCategory[state.bigCategoryId - 1]
-                                    : bigCategory[0]}
+                                    : '전체'}
                             </div>
                             <div className="hash_tag">
                                 #
@@ -463,26 +399,40 @@ const Main = () => {
                             </CategoryName>
                             <div className="all_item_list">
                                 <ul>
-                                    {smallCategory[
-                                        state.bigCategoryId ? state.bigCategoryId - 1 : 0
-                                    ]
-                                        .filter(val => {
-                                            if (!searchInput || val.includes(searchInput))
-                                                return val;
-                                        })
-                                        .map((data, idx) => (
-                                            <li
-                                                className={
-                                                    state.smallCategoryId === idx
-                                                        ? 'active'
-                                                        : 'inactive'
-                                                }
-                                                onClick={() => onSort(idx)}
-                                                key={idx}
-                                            >
-                                                {data}
-                                            </li>
-                                        ))}
+                                    {state.bigCategoryId === 0
+                                        ? bigCategory.map((v, idx) => (
+                                              <li
+                                                  className={
+                                                      state.smallCategoryId === idx
+                                                          ? 'active'
+                                                          : 'inactive'
+                                                  }
+                                                  onClick={() => onSortBig(idx)}
+                                                  key={idx}
+                                              >
+                                                  {v}
+                                              </li>
+                                          ))
+                                        : smallCategory[
+                                              state.bigCategoryId ? state.bigCategoryId - 1 : 0
+                                          ]
+                                              .filter(val => {
+                                                  if (!searchInput || val.includes(searchInput))
+                                                      return val;
+                                              })
+                                              .map((data, idx) => (
+                                                  <li
+                                                      className={
+                                                          state.smallCategoryId === idx
+                                                              ? 'active'
+                                                              : 'inactive'
+                                                      }
+                                                      onClick={() => onSort(idx)}
+                                                      key={idx}
+                                                  >
+                                                      {data}
+                                                  </li>
+                                              ))}
                                 </ul>
                             </div>
                         </MiddleCategory>
@@ -609,7 +559,7 @@ const Main = () => {
                                 </div>
                                 <PaginationWapper>
                                     <Pagination
-                                        activePage={page}
+                                        activePage={state.page}
                                         itemsCountPerPage={items}
                                         totalItemsCount={length}
                                         pageRangeDisplayed={10}
@@ -620,7 +570,7 @@ const Main = () => {
                                 </PaginationWapper>
                             </SortBox>
                             <ListBox>
-                                <ShowList product={product} items={items} page={page} />
+                                <ShowList product={product} items={items} page={state.page} />
                             </ListBox>
                         </Items>
                     </ItemSection>

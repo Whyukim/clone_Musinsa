@@ -1,7 +1,7 @@
 import React, { useReducer, createContext, useContext } from 'react';
 
 const initialFilterVal = {
-    bigCategoryId: 1,
+    bigCategoryId: 0,
     smallCategoryId: 0,
     mainSort: 0,
     price: 0,
@@ -9,6 +9,7 @@ const initialFilterVal = {
     priceMax: 0,
     productTitle: '',
     search: '',
+    page: 1,
 };
 
 export const INIT = 'INIT';
@@ -19,6 +20,7 @@ export const PRICE = 'PRICE';
 export const TITLE = 'TITLE';
 export const ALLTITLE = 'ALLTITLE';
 export const SEARCH = 'SEARCH';
+export const PAGE = 'PAGE';
 
 function MainReducer(state, action) {
     switch (action.type) {
@@ -65,6 +67,11 @@ function MainReducer(state, action) {
             return {
                 ...state,
                 search: action.payload.search,
+            };
+        case PAGE:
+            return {
+                ...state,
+                page: action.payload.page,
             };
 
         default:

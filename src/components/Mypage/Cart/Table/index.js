@@ -135,13 +135,24 @@ function CartTable({ item, setCartList, cartList, cartRemove }) {
 
     // 바로구매
     const onClickOrderButton = useCallback(() => {
+        const number = getData();
+
+        let today = new Date();
+        let year = today.getFullYear(); // 년도
+        let month = today.getMonth() + 1; // 월
+        let date = today.getDate(); // 날짜
+        if (String(date).length === 1) {
+            date = `0${date}`;
+        }
+
         let obj = {
             id: item.id,
             productId: item.productId,
-            price: productItem.price * amountValue,
             count: amountValue,
             size: item.size,
             name: item.name,
+            orderNumber: number.order.length + 1,
+            date: year + '-' + month + '-' + date,
         };
         const orderList = [obj];
 
@@ -269,6 +280,8 @@ function CartTable({ item, setCartList, cartList, cartRemove }) {
                                                 pay={pay}
                                                 orderArr={orderArr}
                                                 setOrder={setOrder}
+                                                cartList={cartList}
+                                                setCartList={setCartList}
                                             />
                                         )}
                                         <button className="del_btn" onClick={removeItem}>

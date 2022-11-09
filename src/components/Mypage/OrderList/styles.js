@@ -31,7 +31,10 @@ export const OrderTable = styled.table`
             text-align: left;
         }
         ul {
-            margin-top: 5px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
             li {
                 a {
                     text-decoration: none;

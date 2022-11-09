@@ -1,8 +1,12 @@
 import React, { useCallback, useState } from 'react';
 import { List } from './styles';
 import { ReactComponent as BasketIcon } from 'assets/svg/Basket.svg';
+import main from 'data/main.json';
 
 const NoticeList = ({ item }) => {
+    const [img, setImg] = useState(() => {
+        return main.filter(v => v.id === item.id)[0].img;
+    });
     function timeForToday(value) {
         const today = new Date();
         const timeValue = new Date(value);
@@ -26,6 +30,10 @@ const NoticeList = ({ item }) => {
         return `${Math.floor(betweenTimeDay / 365)}년전`;
     }
 
+    function getParametersForUnsplash({ width, height, quality, format }) {
+        return `?w=${width}&h=${height}&q=${quality}&fm=${format}&fit=crop`;
+    }
+
     return (
         <List>
             <div>
@@ -37,14 +45,21 @@ const NoticeList = ({ item }) => {
                         <div className="infomation">
                             <div className="infomation_header">
                                 <h4> 주문 완료 </h4>
-                                <p>
-                                    주문({item.createdAt.slice(0, 10).replaceAll('-', '')}
-                                    {item.MerchantUid.replace('mid_', '')})이 완료되었습니다.
-                                </p>
-                                <label>{timeForToday(item.createdAt)}</label>
+                                <p>주문({item.name})이 완료되었습니다.</p>
+                                <label>{timeForToday(item.date)}</label>
                             </div>
                             <div className="infomation_image">
-                                <img src="https://image.msscdn.net/images/goods_img/20220811/2711411/2711411_13_62.jpg" />
+                                <img
+                                    src={
+                                        img +
+                                        getParametersForUnsplash({
+                                            width: 40,
+                                            height: 40,
+                                            quality: 80,
+                                            format: 'jpg',
+                                        })
+                                    }
+                                />
                             </div>
                         </div>
                     </li>

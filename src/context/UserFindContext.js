@@ -1,30 +1,32 @@
 import React, { useReducer, createContext, useContext } from 'react';
 
 const initialFind = {
-	auth: 'phoneAuth',
-	showAuth: 'all',
+    auth: 'phoneAuth',
+    showAuth: 'all',
 
-	findPasswordShowMarkingData: '',
+    findPasswordShowMarkingData: '',
 
-	phoneNumber: '',
-	phoneNumberAuthText: '',
-	phoneCode: '',
-	phoneCodeFlag: false,
-	phoneCheck: '',
+    phoneNumber: '',
+    phoneNumberAuthText: '',
+    phoneCode: '',
+    phoneCodeFlag: false,
+    phoneCheck: '',
 
-	email: '',
-	emailAuthText: '',
-	emailCode: '',
-	emailCodeFlag: false,
-	emailCheck: '',
+    email: '',
+    emailAuthText: '',
+    emailCode: '',
+    emailCodeFlag: false,
+    emailCheck: '',
 
-	findUserId: '',
-	findButtonLoading: false,
+    findUserId: '',
+    findButtonLoading: false,
 
-	modalAuth: false,
-	modalAuthConfirm: false,
+    modalAuth: false,
+    modalAuthConfirm: false,
 
-	authSuccess: false,
+    authSuccess: false,
+
+    mobile: '',
 };
 
 export const INIT = 'INIT';
@@ -53,151 +55,158 @@ export const MODALAUTH = 'MODALAUTH';
 export const MODALAUTHCONFIRM = 'MODALAUTHCONFIRM';
 
 export const AUTHSUCCESS = 'AUTHSUCCESS';
+export const MOBILE = 'MOBILE';
 
 function userReducer(state, action) {
-	switch (action.type) {
-		case INIT:
-			return initialFind;
+    switch (action.type) {
+        case INIT:
+            return initialFind;
 
-		case AUTH:
-			return {
-				...state,
-				auth: action.payload.auth,
-			};
+        case AUTH:
+            return {
+                ...state,
+                auth: action.payload.auth,
+            };
 
-		case SHOWAUTH:
-			return {
-				...state,
-				showAuth: action.payload.showAuth,
-			};
+        case SHOWAUTH:
+            return {
+                ...state,
+                showAuth: action.payload.showAuth,
+            };
 
-		case FINDPASSWORDSHOWMARKINGDATA:
-			return {
-				...state,
-				findPasswordShowMarkingData: action.payload.findPasswordShowMarkingData,
-			};
+        case FINDPASSWORDSHOWMARKINGDATA:
+            return {
+                ...state,
+                findPasswordShowMarkingData: action.payload.findPasswordShowMarkingData,
+            };
 
-		case PHONENUMBER:
-			return {
-				...state,
-				phoneNumber: action.payload.phoneNumber,
-			};
+        case PHONENUMBER:
+            return {
+                ...state,
+                phoneNumber: action.payload.phoneNumber,
+            };
 
-		case PHONENUMBERAUTHTEXT:
-			return {
-				...state,
-				phoneNumberAuthText: action.payload.phoneNumberAuthText,
-			};
+        case PHONENUMBERAUTHTEXT:
+            return {
+                ...state,
+                phoneNumberAuthText: action.payload.phoneNumberAuthText,
+            };
 
-		case PHONECODE:
-			return {
-				...state,
-				phoneCode: action.payload.phoneCode,
-			};
+        case PHONECODE:
+            return {
+                ...state,
+                phoneCode: action.payload.phoneCode,
+            };
 
-		case PHONECODEFLAG:
-			return {
-				...state,
-				phoneCodeFlag: action.payload.phoneCodeFlag,
-			};
+        case PHONECODEFLAG:
+            return {
+                ...state,
+                phoneCodeFlag: action.payload.phoneCodeFlag,
+            };
 
-		case PHONECHECK:
-			return {
-				...state,
-				phoneCheck: action.payload.phoneCheck,
-			};
+        case PHONECHECK:
+            return {
+                ...state,
+                phoneCheck: action.payload.phoneCheck,
+            };
 
-		case EMAIL:
-			return {
-				...state,
-				email: action.payload.email,
-			};
+        case EMAIL:
+            return {
+                ...state,
+                email: action.payload.email,
+            };
 
-		case EMAILAUTHTEXT:
-			return {
-				...state,
-				emailAuthText: action.payload.emailAuthText,
-			};
+        case EMAILAUTHTEXT:
+            return {
+                ...state,
+                emailAuthText: action.payload.emailAuthText,
+            };
 
-		case EMAILCODE:
-			return {
-				...state,
-				emailCode: action.payload.emailCode,
-			};
+        case EMAILCODE:
+            return {
+                ...state,
+                emailCode: action.payload.emailCode,
+            };
 
-		case EMAILCODEFLAG:
-			return {
-				...state,
-				emailCodeFlag: action.payload.emailCodeFlag,
-			};
+        case EMAILCODEFLAG:
+            return {
+                ...state,
+                emailCodeFlag: action.payload.emailCodeFlag,
+            };
 
-		case EMAILCHECK:
-			return {
-				...state,
-				emailCheck: action.payload.emailCheck,
-			};
+        case EMAILCHECK:
+            return {
+                ...state,
+                emailCheck: action.payload.emailCheck,
+            };
 
-		case FINDBUTTONFLAG:
-			return {
-				...state,
-				findButtonFlag: action.payload.findButtonFlag,
-			};
+        case FINDBUTTONFLAG:
+            return {
+                ...state,
+                findButtonFlag: action.payload.findButtonFlag,
+            };
 
-		case FINDUSERID:
-			return {
-				...state,
-				findUserId: action.payload.findUserId,
-			};
+        case FINDUSERID:
+            return {
+                ...state,
+                findUserId: action.payload.findUserId,
+            };
 
-		case FINDBUTTONLOADING:
-			return {
-				...state,
-				findButtonLoading: action.payload.findButtonLoading,
-			};
+        case FINDBUTTONLOADING:
+            return {
+                ...state,
+                findButtonLoading: action.payload.findButtonLoading,
+            };
 
-		case MODALAUTH:
-			return {
-				...state,
-				modalAuth: action.payload.modalAuth,
-			};
+        case MODALAUTH:
+            return {
+                ...state,
+                modalAuth: action.payload.modalAuth,
+            };
 
-		case MODALAUTHCONFIRM:
-			return {
-				...state,
-				modalAuthConfirm: action.payload.modalAuthConfirm,
-			};
+        case MODALAUTHCONFIRM:
+            return {
+                ...state,
+                modalAuthConfirm: action.payload.modalAuthConfirm,
+            };
 
-		case AUTHSUCCESS:
-			return {
-				...state,
-				authSuccess: action.payload.authSuccess,
-			};
+        case AUTHSUCCESS:
+            return {
+                ...state,
+                authSuccess: action.payload.authSuccess,
+            };
 
-		default:
-			throw new Error(`Unhandled action type: ${action.type}`);
-	}
+        case MOBILE:
+            return {
+                ...state,
+                mobile: action.payload.mobile,
+            };
+
+        default:
+            throw new Error(`Unhandled action type: ${action.type}`);
+    }
 }
 
 const UserFindStateContext = createContext();
 const UserFindDispatchContext = createContext();
 
 export function UserFindProvider({ children }) {
-	const [state, dispatch] = useReducer(userReducer, initialFind);
-	return (
-		<UserFindStateContext.Provider value={state}>
-			<UserFindDispatchContext.Provider value={dispatch}>
-				{children}
-			</UserFindDispatchContext.Provider>
-		</UserFindStateContext.Provider>
-	);
+    const [state, dispatch] = useReducer(userReducer, initialFind);
+    return (
+        <UserFindStateContext.Provider value={state}>
+            <UserFindDispatchContext.Provider value={dispatch}>
+                {children}
+            </UserFindDispatchContext.Provider>
+        </UserFindStateContext.Provider>
+    );
 }
 
 export function useUserFindState() {
-	return useContext(UserFindStateContext);
+    return useContext(UserFindStateContext);
 }
 
 export function useUserFindDispatch() {
-	return useContext(UserFindDispatchContext);
+    return useContext(UserFindDispatchContext);
 }
 
 /* 예시 */

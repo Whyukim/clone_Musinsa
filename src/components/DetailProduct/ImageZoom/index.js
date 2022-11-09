@@ -53,7 +53,6 @@ const ImageZoom = ({ img, alt }) => {
         return `?w=${width}&h=${height}&q=${quality}&fm=${format}&fit=crop`;
     }
 
-    console.log(img);
     return (
         <ProductImgContainer>
             <ProductImg show={show} onMouseMove={onMoseMoveZoom} onClick={onClickZoomIn}>

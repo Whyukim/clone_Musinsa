@@ -7,6 +7,10 @@ import { URLquery } from 'utils/URLquery';
 import Cookies from 'js-cookie';
 import { useScript } from 'hooks/useScript';
 import { useCallback } from 'react';
+import userData from 'data/user.json';
+import { getStorage } from 'utils/getStorage';
+import { setStorage } from 'utils/setStorage';
+import { BOSKET, useGlobalDispatch } from 'context/GlobalContext';
 
 const Kakao = () => {
     const kakaoScript = useScript('https://developers.kakao.com/sdk/js/kakao.min.js');
@@ -14,6 +18,8 @@ const Kakao = () => {
     const REST_API_KEY = process.env.REACT_APP_KAKAO_REST_API;
     const REDIRECT_URI = process.env.REACT_APP_KAKAO_REDIRECT_URI;
     const CLIENT_SECRET = process.env.REACT_APP_KAKAO_CLIENT_SECRET;
+
+    const basketDispatch = useGlobalDispatch();
 
     // calllback으로 받은 인가코드
     const navigate = useNavigate();
@@ -33,68 +39,66 @@ const Kakao = () => {
         try {
             // access token 가져오기
             const res = await axios.post('https://kauth.kakao.com/oauth/token', payload);
-            const token = res.data.access_token;
-            const params = `token=${token}`;
 
-            const isMember = await KakaoGetQueryApi(
-                'http://141.164.48.244/api/auth/kakao/callback',
-                params,
-            );
-            const { alreadyMember, encryptionCode } = isMember.data;
+            // Kakao Javascript SDK 초기화
+            window.Kakao.init(REST_API_KEY);
+            // access token 설정
+            window.Kakao.Auth.setAccessToken(res.data.access_token);
 
-            if (alreadyMember) {
-                await PostHeaderApi('/api/auth/signin', 'encryptioncode', encryptionCode)
-                    .then(result => {
-                        switch (result.status) {
-                            case 200:
-                                if (autoLogin === 'true') {
-                                    localStorage.setItem('data', JSON.stringify(result.data));
-                                    sessionStorage.removeItem('data');
-                                } else {
-                                    sessionStorage.setItem('data', JSON.stringify(result.data));
-                                    localStorage.removeItem('data');
-                                }
+            let data = await window.Kakao.API.request({
+                url: '/v2/user/me',
+            });
 
-                                const redirect = Cookies.get('redirect');
-                                if (redirect) {
-                                    navigate(redirect);
-                                    return Cookies.remove('redirect');
-                                }
+            let users = getStorage('user') || userData;
+            console.log(users);
+            let login = users.filter(v => v.userId === data.kakao_account.email);
 
-                                return navigate('/');
-                            default:
-                                break;
-                        }
-                    })
-                    .catch(result => {
-                        switch (result.response.status) {
-                            case 401:
-                                alert('존재하지않거나 아이디가 틀렸습니다.');
-                                break;
+            let params = {};
+            if (!login.length) {
+                params = {
+                    kakao: true,
+                    id: users.length + 1,
+                    userId: data.kakao_account.email,
+                    userPw: '',
+                    info: {
+                        name: data.properties.nickname,
+                        phone: '',
+                        mobile: '',
+                        address: '',
+                    },
+                    likes: [],
+                    baskets: [],
+                    order: [],
+                };
 
-                            case 402:
-                                alert('패스워드가 일치하지 않습니다');
-                                break;
-
-                            case 500:
-                                console.log('서버에러');
-                                break;
-
-                            default:
-                                break;
-                        }
-                    });
+                users = [...users, params];
+                setStorage('user', users);
             } else {
-                navigate(`/signup?kakao=${encryptionCode}&token=${token}`);
+                params = login[0];
+
+                const payload = {
+                    basketCount: login[0].baskets.length,
+                };
+                basketDispatch({ type: BOSKET, payload });
             }
+
+            sessionStorage.setItem('data', JSON.stringify(params));
+            localStorage.removeItem('data');
+
+            const redirect = Cookies.get('redirect');
+            if (redirect) {
+                navigate(redirect);
+                return Cookies.remove('redirect');
+            }
+            navigate('/');
         } catch (err) {
-            console.log(err);
+            console.error(err);
         }
     }, [autoLogin, code]);
 
     useEffect(() => {
         if (kakaoScript === 'ready') getToken();
-    }, [kakaoScript, global]);
+    }, [kakaoScript]);
 
     return null;
 };

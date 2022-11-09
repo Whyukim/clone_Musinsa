@@ -12,7 +12,6 @@ const ProductInfoImageList = ({ image }) => {
         const callback = (entries, observer) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    console.log('is intersecting', entry.target.dataset.src);
                     entry.target.src = entry.target.dataset.src;
                     observer.unobserve(entry.target);
                 }

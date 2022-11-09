@@ -1,12 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'react-router';
+import { useLocation, useParams } from 'react-router';
 import { LoginContainer } from './styles';
 import { ReactComponent as CancelIcon } from 'assets/svg/Cancel.svg';
 
 const UserEmail = ({ email, setEmail, onChangeEmail, placeholder, title, reg, setReg }) => {
-    const [signUpPage, setSignUpPage] = useState(
-        window.location.pathname === '/login' || '#/login' ? false : true,
-    );
+    const location = useLocation();
+    const { pathname } = location;
 
     // input clear button
     const onClickClear = useCallback(() => {
@@ -36,10 +35,8 @@ const UserEmail = ({ email, setEmail, onChangeEmail, placeholder, title, reg, se
                         </button>
                     )}
                 </div>
-                {signUpPage && !reg && title && email.length > 0 && (
-                    <p>아이디는 필수정보 입니다.</p>
-                )}
-                {signUpPage && !reg && !title && <p>답변은 필수정보 입니다.</p>}
+
+                {pathname === '/signup' && <p className="login-input__validation">{reg}</p>}
             </LoginContainer>
         </>
     );

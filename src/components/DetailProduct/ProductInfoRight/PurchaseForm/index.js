@@ -93,18 +93,6 @@ const PurchaseForm = () => {
         );
     }, [optionData]);
 
-    // 좋아요 표시
-    // const userLikes = useCallback(async () => {
-    //     const token = user.accessToken;
-    //     try {
-    //         const result = await GetTokenApi('/api/mypage/favoriteGoods', token);
-    //         let likeProduct = result.data.likeProduct.filter(v => `${v.id}` === query.productId);
-    //         setClickedlike(Object.keys(likeProduct).length > 0 ? true : false);
-    //     } catch (error) {
-    //         console.log(error);
-    //     }
-    // }, []);
-
     // 첫화면 초기화
     useEffect(() => {
         const asyncFunction = async () => {
@@ -272,7 +260,7 @@ const PurchaseForm = () => {
                 let amount = itemSplit[1];
 
                 const obj = {
-                    id: 0,
+                    id: Number(query.productId),
                     productId: item[1],
                     count: item[2],
                     size: item[3],

@@ -1,23 +1,17 @@
-import ConfirmModal from 'components/Modals/ConfirmModal';
-import OrderRefund from 'components/OrderRefund';
 import React from 'react';
 import { useState } from 'react';
-import { useCallback } from 'react';
-import { thousandComma } from 'utils/thousandComma';
 import { ImgSpan } from '../styles';
+import itemData from 'data/main.json';
+import { thousandComma } from 'utils/thousandComma';
 
 function OrderList({ data }) {
-    const [show, setShow] = useState(false);
-    const [cancelPay, setCancelPay] = useState(false);
+    const [item, setItem] = useState(() => {
+        return itemData.filter(v => v.id === data.id)[0];
+    });
 
-    const onCloseModal = useCallback(() => {
-        setShow(false);
-    }, [show]);
-
-    const onClickConfirm = useCallback(() => {
-        setCancelPay(true);
-        setShow(false);
-    }, []);
+    function getParametersForUnsplash({ width, height, quality, format }) {
+        return `?w=${width}&h=${height}&q=${quality}&fm=${format}&fit=crop`;
+    }
 
     return (
         <tbody>
@@ -26,41 +20,39 @@ function OrderList({ data }) {
                     <ImgSpan>
                         <a href={`/detail?productId=${data.id}`}>
                             <img
-                                src={`https://musinsa-s3.s3.ap-northeast-2.amazonaws.com/image/${data.Product.ProductImg.src}`}
-                                alt="더미데이터"
-                                width="50px"
-                                height="50px"
+                                src={
+                                    item.img +
+                                    getParametersForUnsplash({
+                                        width: 80,
+                                        height: 96,
+                                        quality: 80,
+                                        format: 'jpg',
+                                    })
+                                }
                             />
                         </a>
                     </ImgSpan>
                     <ul>
                         <li>
                             <a href={`/detail?productId=${data.id}`}>
-                                <strong>{data.Product.productTitle}</strong>
+                                <strong>{item.productTitle}</strong>
                             </a>
                         </li>
                         <li>
-                            옵션 : {data.ProductSubTag.name} / {data.ProductMainTag.name}
+                            옵션 : {data.size} / {data.name}
                         </li>
                     </ul>
                 </td>
-                <td>{data.createdAt.substr(0, 10)}</td>
-                <td>{data.id}</td>
+                <td>{data.date}</td>
+                <td>{data.orderNumber}</td>
                 <td>
-                    {thousandComma(data.orderPrice * data.amount)}원<br />
-                    <span>({data.amount}개)</span>
+                    {thousandComma(item.price * data.count)}원<br />
+                    <span>({data.count}개)</span>
                 </td>
                 <td colSpan="2">
                     <span>주문완료</span>
                 </td>
             </tr>
-            {cancelPay && <OrderRefund data={data} />}
-            <ConfirmModal
-                show={show}
-                onCloseModal={onCloseModal}
-                onClickConfirm={onClickConfirm}
-                content={`환불을 진행 하시겠습니까?`}
-            ></ConfirmModal>
         </tbody>
     );
 }

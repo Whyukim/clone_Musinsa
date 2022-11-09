@@ -27,6 +27,8 @@ import { ALL, TITLE } from 'context/MainContext';
 import NoticeList from 'components/NoticeList';
 import { useMemo } from 'react';
 import { useGlobalDispatch, useGlobalState } from 'context/GlobalContext';
+import { getStorage } from 'utils/getStorage';
+import { setStorage } from 'utils/setStorage';
 
 const Header = props => {
     const token = getData()?.accessToken;
@@ -114,6 +116,15 @@ const Header = props => {
     };
 
     const deleteLogout = useCallback(() => {
+        let user = getStorage('user');
+        let data = getStorage('data');
+
+        for (let i = 0; i < user.length; i++) {
+            if (user[i].id === data.id) {
+                user[i] = data;
+            }
+        }
+        setStorage('user', user);
         deleteData();
         setLogin(false);
     }, [login]);
@@ -126,10 +137,8 @@ const Header = props => {
     const onClickNotice = useCallback(async () => {
         setNotice(!notice);
         //알림창에 넣을 orderLsit 호출
-        if (!notice)
-            await GetTokenApi('/api/order/orderList', token).then(res => {
-                setNoticeList(res.data);
-            });
+        const { order } = getStorage('data') || null;
+        if (order) setNoticeList(order);
     }, [notice]);
 
     const noticeDay = useMemo(() => {

@@ -63,16 +63,35 @@ function Cart() {
         //           arrAmount.filter(f => f !== v.packingAmount),
         // );
 
+        const loginData = getData();
         const arr = [];
-        for (let i = 0; i < arrBsId.length; i++) {
-            let obj = {
-                shoppingBasketId: arrBsId[i],
-                price: arrPrice[i],
-                amount: arrAmount[i],
-            };
-            arr.push(obj);
-            setOrderArr(arr);
+        let cnt = loginData.order.length;
+
+        let today = new Date();
+        let year = today.getFullYear(); // 년도
+        let month = today.getMonth() + 1; // 월
+        let date = today.getDate(); // 날짜
+        if (String(date).length === 1) {
+            date = `0${date}`;
         }
+
+        loginData.baskets.map(v => {
+            if (v.check && v.amount) {
+                cnt++;
+
+                let obj = {
+                    id: v.id,
+                    productId: v.productId,
+                    count: v.count,
+                    size: v.size,
+                    name: v.name,
+                    orderNumber: cnt,
+                    date: year + '-' + month + '-' + date,
+                };
+                arr.push(obj);
+            }
+        });
+        setOrderArr([...arr]);
     }, [cartList]);
 
     // 모두 체크 확인 및 총상품 금액
@@ -166,7 +185,15 @@ function Cart() {
                     </CartPayment>
                     <OrderBtn>
                         <button onClick={onClickOrderButton}>결제하기</button>
-                        {order && <Order pay={pay} orderArr={orderArr} setOrder={setOrder} />}
+                        {order && (
+                            <Order
+                                pay={pay}
+                                orderArr={orderArr}
+                                setOrder={setOrder}
+                                cartList={cartList}
+                                setCartList={setCartList}
+                            />
+                        )}
                     </OrderBtn>
                 </div>
 

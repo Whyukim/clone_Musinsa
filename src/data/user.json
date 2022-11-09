@@ -1,5 +1,6 @@
 [
     {
+        "kakao": false,
         "id": 1,
         "userId": "test",
         "userPw": "test",
@@ -48,6 +49,27 @@
                 "check": true
             }
         ],
-        "order": []
+        "order": [
+            {
+                "id": 440,
+                "productId": "6368995b8aaa8407a828f9d0",
+                "count": 1,
+                "size": "S",
+                "name": "오렌지",
+                "title": "et",
+                "price": 2098,
+                "date": "2022-10-20",
+                "orderNumber": 1
+            },
+            {
+                "id": 1,
+                "productId": "63688cae72ec84f38064aa2a",
+                "count": 1,
+                "size": "S",
+                "name": "퍼플",
+                "date": "2022-10-20",
+                "orderNumber": 2
+            }
+        ]
     }
 ]

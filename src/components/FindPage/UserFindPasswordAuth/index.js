@@ -2,127 +2,84 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import UserFindAuth from '../UserFindAuth';
 import {
-	AUTH,
-	SHOWAUTH,
-	FINDPASSWORDSHOWMARKINGDATA,
-	useUserFindDispatch,
-	useUserFindState,
+    AUTH,
+    SHOWAUTH,
+    FINDPASSWORDSHOWMARKINGDATA,
+    useUserFindDispatch,
+    useUserFindState,
+    MOBILE,
 } from 'context/UserFindContext';
 import { PostHeaderApi, PostHeaderBodyApi } from 'utils/api';
 import { AuthUser } from './styles';
 import { maskingFunc } from 'utils/masking';
 import { storageData } from 'utils/storageData';
 import { URLquery } from 'utils/URLquery';
+import userData from 'data/user.json';
+import { getStorage } from 'utils/getStorage';
 
 const UserFindPasswordAuth = () => {
-	const userFind = useUserFindState();
-	const dispatch = useUserFindDispatch();
-	const userId = storageData('userId');
-	const { auth, emailCheck, phoneNumber, phoneCheck, email, authSuccess } = userFind;
+    const userFind = useUserFindState();
+    const dispatch = useUserFindDispatch();
+    const { auth, emailCheck, phoneCheck, authSuccess } = userFind;
 
-	const navigate = useNavigate();
-	const location = useLocation();
-	const query = URLquery(location);
+    const navigate = useNavigate();
+    const location = useLocation();
+    const query = URLquery(location);
 
-	const [authUser, setAuthUser] = useState('');
-	const [authStyle, setAuthStyle] = useState('');
+    const [authUser, setAuthUser] = useState('');
 
-	const changeDispatch = useCallback((type, payload) => {
-		return dispatch({ type, payload });
-	}, []);
+    const changeDispatch = useCallback((type, payload) => {
+        return dispatch({ type, payload });
+    }, []);
 
-	// 개인정보 마킹
-	useEffect(() => {
-		const asyncFunction = async () => {
-			const loginidchecktoken = query.token.replace(/\s/g, '+');
-			const result = await PostHeaderApi(
-				'/api/auth/checkIsLoginIdCheckUser',
-				'loginidchecktoken',
-				`${loginidchecktoken}`,
-			);
-			const userData = result.data.userData;
-			console.log(userData);
+    // 개인정보 마킹
+    useEffect(() => {
+        const asyncFunction = async () => {
+            const users = getStorage('user') || userData;
+            const user = users.filter(v => v.userId === query.token);
 
-			const payload = {
-				auth: userData.includes('@') ? 'emailAuth' : 'phoneAuth',
-				showAuth: userData.includes('@') ? 'emailAuth' : 'phoneAuth',
-				findPasswordShowMarkingData: userData,
-			};
-			dispatch({ type: SHOWAUTH, payload });
-			dispatch({ type: AUTH, payload });
-			dispatch({ type: FINDPASSWORDSHOWMARKINGDATA, payload });
+            let answer = maskingFunc.phone(user[0].info.mobile);
+            setAuthUser(answer);
 
-			let answer = '';
-			if (userData.includes('@')) {
-				answer = maskingFunc.email(userData);
-				setAuthStyle('emailAuth');
-			} else {
-				answer = maskingFunc.phone(userData);
-				setAuthStyle('phoneAuth');
-			}
-			setAuthUser(answer);
-		};
+            changeDispatch(MOBILE, { mobile: user[0].info.mobile });
+        };
 
-		asyncFunction();
-	}, []);
+        asyncFunction();
+    }, []);
 
-	// 아이디 찾기
-	useEffect(() => {
-		if (auth === 'emailAuth' && authSuccess && emailCheck) {
-			// 이메일로 아이디 찾기
-			const asyncFunction = async () => {
-				const data = {
-					loginId: userId,
-					email,
-				};
+    // 아이디 찾기
+    useEffect(() => {
+        if (auth === 'phoneAuth' && authSuccess && phoneCheck) {
+            // 휴대전화로 아이디 찾기
+            const asyncFunction = async () => {
+                // const data = {
+                //     loginId: userId,
+                //     phoneNumber: phoneNumber.replaceAll('-', ''),
+                // };
+                // try {
+                //     const result = await PostHeaderBodyApi(
+                //         '/api/auth/findPassword',
+                //         data,
+                //         'phoneCheck',
+                //         phoneCheck,
+                //     );
+                //     const token = result.data.changePasswordToken;
+                //     navigate(`/find/password/change?token=${token}`);
+                // } catch (error) {
+                //     console.log(error);
+                // }
+            };
 
-				try {
-					const result = await PostHeaderBodyApi(
-						'/api/auth/findPassword',
-						data,
-						'emailCheck',
-						emailCheck,
-					);
-					const token = result.data.changePasswordToken;
-					navigate(`/find/password/change?token=${token}`);
-				} catch (error) {
-					console.log(error);
-				}
-			};
+            asyncFunction();
+        }
+    }, [authSuccess, emailCheck, phoneCheck]);
 
-			asyncFunction();
-		} else if (auth === 'phoneAuth' && authSuccess && phoneCheck) {
-			// 휴대전화로 아이디 찾기
-			const asyncFunction = async () => {
-				const data = {
-					loginId: userId,
-					phoneNumber: phoneNumber.replaceAll('-', ''),
-				};
-
-				try {
-					const result = await PostHeaderBodyApi(
-						'/api/auth/findPassword',
-						data,
-						'phoneCheck',
-						phoneCheck,
-					);
-					const token = result.data.changePasswordToken;
-					navigate(`/find/password/change?token=${token}`);
-				} catch (error) {
-					console.log(error);
-				}
-			};
-
-			asyncFunction();
-		}
-	}, [authSuccess, emailCheck, phoneCheck]);
-
-	return (
-		<>
-			<AuthUser authStyle={authStyle}>{authUser}</AuthUser>
-			<UserFindAuth></UserFindAuth>
-		</>
-	);
+    return (
+        <>
+            <AuthUser>{authUser}</AuthUser>
+            <UserFindAuth></UserFindAuth>
+        </>
+    );
 };
 
 export default UserFindPasswordAuth;
