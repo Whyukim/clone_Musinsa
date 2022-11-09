@@ -5,6 +5,7 @@ import { LikeSection, PagenationBox } from './styles';
 import Pagination from 'react-js-pagination';
 import { getData } from 'utils/getData';
 import itemData from 'data/main.json';
+import { setData } from 'utils/setData';
 
 function Mainlike() {
     // 페이지네이션
@@ -25,10 +26,17 @@ function Mainlike() {
     }, []);
 
     // 좋아요리스트 삭제
-    const onRemove = useCallback(id => {
-        const deleteList = likeLists.filter(likeList => likeList.id !== id);
-        setlikeList(deleteList);
-    });
+    const onRemove = useCallback(
+        id => {
+            const deleteList = likeLists.filter(likeList => likeList.id !== id);
+            const temp = deleteList.map(v => v.id);
+            setlikeList(deleteList);
+
+            loginToken.likes = temp;
+            setData(loginToken);
+        },
+        [loginToken],
+    );
 
     return (
         <>
